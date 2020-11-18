@@ -33,9 +33,12 @@ contract ContractFactory {
         _;
     }
     
-    // to be written 
-    modifier inTime {
-        // require the bidding to be pushed within the deadline 
+    // the two parameters written before has to be defined in the Tender (?)
+    modifier inTime(unint _CreationDate, unint _CompletionDate) {
+        require(
+        now >= _CreationDate && now < _CompletionDate,
+        "The bid has to be placed after the bid opening date and before the bid closing date."
+        );
         _;
     }
     
