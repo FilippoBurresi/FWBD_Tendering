@@ -18,7 +18,7 @@ contract ContractFactory {
         address _governementAddress; //?? how to retrive its public key
         uint _tenderId; // number that uniquely identifies the tendering in question
         uint _bidAmount; // final price offered by the firm
-        string _taskDescription // contain a more comprehensive description than the _bidAmount about timing, quantities etc offered by the firm 
+        string _taskDescription; // contain a more comprehensive description than the _bidAmount about timing, quantities etc offered by the firm 
         string _attacchments; // it can contain urls to external documents, e.g. accounting sheets
         string status; // it can be either 'pending' or 'complete'
     }
