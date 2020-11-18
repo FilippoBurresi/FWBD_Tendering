@@ -33,7 +33,7 @@ contract ContractFactory {
         _;
     }
     
-    // the two parameters written before has to be defined in the Tender (?)
+    // the two parameters written below has to be defined in the Tender (?)
     modifier inTime(unint _CreationDate, unint _CompletionDate) {
         require(
         now >= _CreationDate && now < _CompletionDate,
