@@ -1,0 +1,41 @@
+pragma solidity >=0.5.0 <0.6.0;
+
+contract PA{
+    
+    struct P_A {
+        string name;
+        string competence;
+        uint addedBy; 
+    } 
+    // who first deploy the contract 
+    address owner = msg.sender;
+    // the following mapping contains the address of the public administration that are allowed to create a tender
+    // F: secondo me basta array, altrimenti mapping infinito
+    mapping(address => bool) allowedAddress; 
+    mapping(address => P_A) organisations;
+    
+    // modifiers
+    modifier onlyOwner() {
+        require(msg.sender == owner);
+        _;
+    }
+    modifier onlyAllowedAddress() {
+        require(allowedAddress[msg.sender]);
+        _;
+    }
+    
+    
+    // functions
+    
+
+    //not take struct 
+    // function getTenderByOwner (address _owner,  struct memory Tender) public view return(struct Tender[]){
+        Tender[] tenderByOwner;
+        for (uint=0; i < activeTender.length; i++){
+            if (activeTender[i].owner == _owner){
+                tenderByOwner.push(activeTender[i]);
+            }
+        }
+        return tenderByOwner;
+    }
+}
