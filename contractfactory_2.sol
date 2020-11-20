@@ -26,10 +26,11 @@ contract ContractFactory {
     Contract[] public contracts; //dynamic array of contracts => think how to hash the content of the contracts! 
     
     mapping (uint => address) public contractToOwner; // it is what will be published at the end 
-    
-    // to be written 
+    mapping (address => bool) contractorApproved;
+
+    //use the bool value to check if the contractor is approved after approving the contractor with addContractor function
     modifier onlyApproved {
-        // require the bidding firm to be registered inside the approved firm to deal with PA
+        require(contractorApproved[msg.sender], "Caller is not an approvated contractor");
         _;
     }
     
@@ -42,6 +43,11 @@ contract ContractFactory {
         _;
     }
     
+    // creating the function that need to be called only from the PA to add an authorized contractor address
+    function addContractor(address _contractorAddress) {
+        contractorApproved[_contractorAddress]=true;
+    }
+
     // creating a pending contract and signaling it to all the nodes in the blockchain
     function createContract(address _contractorAddress, address _governementAddress, uint _tenderId, uint _bidAmount, string _taskDescription, string _attacchments) private onlyApproved, inTime {
         require(msg.sender == _contractorAddress); //?? maybe it's already checked with 'private'
