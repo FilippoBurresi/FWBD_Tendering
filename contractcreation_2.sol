@@ -1,6 +1,6 @@
 pragma solidity >=0.5.0 <0.6.0;
 
-
+// import...
 /// @title A contract that bidding firms use to send their biddings
 /// @notice For now, the contract allows firms to send their created biddings, and later we have to add the sending of the keys to the PA
 contract ContractBidding is ContractFactory {
