@@ -69,27 +69,28 @@ contract TenderingSmartContract {
     // after the deadline contractors can send the actual offer
     function concludeBid(uint256 _tenderKey, uint32 _bidkey, string memory _description) public {
         //assert that the deadline is respected
-        assert(tenders[_tenderkey].bidSubmissionClosingDateData > now);
+        assert(tenders[_tenderKey].bidSubmissionClosingDateData > now);
         //assert that the it is the bids of the contractor that it is trying to conclude the Bid
-        assert(tenders[_tenderKey].bids[_bidKey].contractor == msg.sender);
+        assert(tenders[_tenderKey].bids[_bidkey].contractor == msg.sender);
         // check that the hash correspond
-        assert (keccak256(abi.encodePacked(_description)) == tenders[_tenderKey].bids[_bidKey].hashOffer);
+        assert (keccak256(abi.encodePacked(_description)) == tenders[_tenderKey].bids[_bidkey].hashOffer);
         // finally conclude the bid by submitting the restriction
-        tenders[_tenderKey].bids[_bidKey].description = _description;
-        tenders[_tenderKey].bids[_bidKey].valid = true;
+        tenders[_tenderKey].bids[_bidkey].description = _description;
+        tenders[_tenderKey].bids[_bidkey].valid = true;
 
     }
 
     // after the deadline for submitting the actual offer the tendering organization can see all offer and assigned the
-    // ! I didn't managed to declare this as a view function...
-    function getBidsByKey(uint256 _tenderId) public returns (address, string) {
+    // ! I didn't managed to declare this as a view function... 
+    // the function cannot be declared as view if push is used
+    function getBidsByKey(uint256 _tenderId) public returns (address[] memory, string[] memory) {
 
 
         //for (uint i = 0; i < tenders[_tenderId].bids.length; i++){
 
-            //if (tenders[_tenderKey].bids[_bidKey].valid == true){
-               // _contractors.push(tenders[_tenderKey].bids[_bidKey].contractor);
-                //_descriptions.push(tenders[_tenderKey].bids[_bidKey].description);
+            //if (tenders[_tenderId].bids[i].valid == true){
+               // _contractors.push(tenders[_tenderId].bids[i].contractor);
+                //_descriptions.push(tenders[_tenderId].bids[i].description);
             //}
 
         //}
