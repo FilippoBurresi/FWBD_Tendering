@@ -79,17 +79,17 @@ contract TenderingSmartContract {
         tenderKeys ++;
 
             }
-            
-    modifier inTime (uint256 _tenderKey) {
+      
+    modifier inTimeHash (uint256 _tenderKey) {
         require(
-        (now >= tenders[_tenderKey].bidOpeningDate) && (now < tenders[_tenderKey].bidSubmissionClosingDateHash),
-        "The bid has to be placed after the bid opening date and before the bid closing date."
+        (now >= tenders[_tenderKey].bidOpeningDate) && (now <= tenders[_tenderKey].bidSubmissionClosingDateHash),
+        "The hashed bid has to be placed after the bid opening date and before the hash closing date."
         );
         _;
     }        
 
     // this function allowed contractors to participate the tender by sumbitting the hash
-    function placeBid (uint256 _tenderKey, bytes32 _hashOffer) public inTime(_tenderKey) {
+    function placeBid (uint256 _tenderKey, bytes32 _hashOffer) public inTimeHash(_tenderKey) {
 
         uint bidKey = tenders[_tenderKey].bidList.length;
         tenders[_tenderKey].bidList.push(bidKey);
@@ -97,11 +97,21 @@ contract TenderingSmartContract {
         tenders[_tenderKey].bids[bidKey].hashOffer = _hashOffer;
 
     }
+    
+      modifier inTimeData (uint256 _tenderKey) {
+        require(
+        (now > tenders[_tenderKey].bidSubmissionClosingDateHash) && (now < tenders[_tenderKey].bidSubmissionClosingDateData),
+        "The data has to be sent after the hash closing date and before the data closing date."
+        );
+        _;
+    } 
 
     // after the deadline contractors can send the actual offer
-    function concludeBid(uint256 _tenderKey, uint32 _bidkey, string memory _description) public {
-        //assert that the deadline is respected
-        assert(tenders[_tenderKey].bidSubmissionClosingDateData > now);
+    function concludeBid(uint256 _tenderKey, uint32 _bidkey, string memory _description) public inTimeData(_tenderKey) {
+    
+        
+        //assert(tenders[_tenderKey].bidSubmissionClosingDateData > now); // I have commented this line because the modifier inTimeData checks for this
+        
         //assert that the it is the bids of the contractor that it is trying to conclude the Bid
         assert(tenders[_tenderKey].bids[_bidkey].contractor == msg.sender);
         // check that the hash correspond
