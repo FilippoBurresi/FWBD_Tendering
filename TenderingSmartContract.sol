@@ -86,14 +86,14 @@ contract TenderingSmartContract {
     function getBidsByKey(uint256 _tenderId) public returns (address[] memory, string[] memory) {
 
 
-        //for (uint i = 0; i < tenders[_tenderId].bids.length; i++){
+        for (uint i = 0; i < tenders[_tenderId].bidList.length; i++){
 
-            //if (tenders[_tenderId].bids[i].valid == true){
-               // _contractors.push(tenders[_tenderId].bids[i].contractor);
-                //_descriptions.push(tenders[_tenderId].bids[i].description);
-            //}
+            if (tenders[_tenderId].bids[i].valid == true){
+               _contractors.push(tenders[_tenderId].bids[i].contractor);
+               _descriptions.push(tenders[_tenderId].bids[i].description);
+            }
 
-        //}
+        }
 
         return (_contractors, _descriptions);
 
