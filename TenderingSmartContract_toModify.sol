@@ -65,21 +65,31 @@ contract TenderingSmartContract {
     
     // fine 
 
-    function CreateTender(string memory _tenderName, string memory _description, uint256 _bidOpeningDate,uint256 _bidSubmissionClosingDateHash,
-    uint256 _bidSubmissionClosingDateData) public  onlyAllowed{
+    
+    function CreateTender(string memory _tenderName, string memory _description, uint256 _daysUntilClosingDateHash,
+    uint256 _daysUntilClosingDateData) public  onlyAllowed{
         tenders[tenderKeys].tenderName = _tenderName;
         tenders[tenderKeys].description = _description;
-        tenders[tenderKeys].bidOpeningDate = _bidOpeningDate;
-        tenders[tenderKeys].bidSubmissionClosingDateHash = _bidSubmissionClosingDateHash;
-        tenders[tenderKeys].bidSubmissionClosingDateData = _bidSubmissionClosingDateData;
+        //Flavia: changed the 3 following  code lines
+        tenders[tenderKeys].bidOpeningDate = now;
+        tenders[tenderKeys].bidSubmissionClosingDateHash = now + (_daysUntilClosingDateHash * 1 days);
+        tenders[tenderKeys].bidSubmissionClosingDateData = now + (_daysUntilClosingDateData * 1 days);
         emit message("Tender Depoyed", msg.sender);
 
         tenderKeys ++;
 
             }
+            
+    modifier inTime (uint256 _tenderKey) {
+        require(
+        (now >= tenders[_tenderKey].bidOpeningDate) && (now < tenders[_tenderKey].bidSubmissionClosingDateHash),
+        "The bid has to be placed after the bid opening date and before the bid closing date."
+        );
+        _;
+    }        
 
     // this function allowed contractors to participate the tender by sumbitting the hash
-    function placeBid (uint256 _tenderKey, bytes32 _hashOffer) public {
+    function placeBid (uint256 _tenderKey, bytes32 _hashOffer) public inTime(_tenderKey) {
 
         uint bidKey = tenders[_tenderKey].bidList.length;
         tenders[_tenderKey].bidList.push(bidKey);
@@ -108,14 +118,14 @@ contract TenderingSmartContract {
     function getBidsByKey(uint256 _tenderId) public returns (address[] memory, string[] memory) {
 
 
-        //for (uint i = 0; i < tenders[_tenderId].bids.length; i++){
+        for (uint i = 0; i < tenders[_tenderId].bidList.length; i++){
 
-            //if (tenders[_tenderId].bids[i].valid == true){
-               // _contractors.push(tenders[_tenderId].bids[i].contractor);
-                //_descriptions.push(tenders[_tenderId].bids[i].description);
-            //}
+            if (tenders[_tenderId].bids[i].valid == true){
+               _contractors.push(tenders[_tenderId].bids[i].contractor);
+               _descriptions.push(tenders[_tenderId].bids[i].description);
+            }
 
-        //}
+        }
 
         return (_contractors, _descriptions);
 
