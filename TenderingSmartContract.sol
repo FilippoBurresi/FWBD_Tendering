@@ -58,7 +58,7 @@ contract TenderingSmartContract {
 
     // this function allowed contractors to participate the tender by sumbitting the hash
     function placeBid (uint256 _tenderKey, bytes32 _hashOffer) public {
-
+        assert(tenders[_tenderKey].bidSubmissionClosingDateHash > now);
         uint bidKey = tenders[_tenderKey].bidList.length;
         tenders[_tenderKey].bidList.push(bidKey);
         tenders[_tenderKey].bids[bidKey].contractor = msg.sender;
