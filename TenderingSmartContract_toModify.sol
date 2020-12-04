@@ -26,6 +26,7 @@ contract TenderingSmartContract {
         uint256 bidSubmissionClosingDateData;
         uint[] bidList; // array where to store the index of all the bid
         mapping(uint => BiddingOffer) bids;
+        mapping(address => uint) bidIdFromAddress;
         address tenderingInstitution;
         address winningContractor;
     }
@@ -95,23 +96,24 @@ contract TenderingSmartContract {
         tenders[_tenderKey].bidList.push(bidKey);
         tenders[_tenderKey].bids[bidKey].contractor = msg.sender;
         tenders[_tenderKey].bids[bidKey].hashOffer = _hashOffer;
+        
+        //assigning to the address of the contractor its bidkey
+        tenders[_tenderKey].bidIdFromAddress[msg.sender] = bidKey;
 
     }
     
-    //Instead of making a mapping for the address/bidkey thing we might do in the following way:
+    //The following function returns the bid_id of a certain address.
+    //this bid_id has to be put in the concludeBid function when called from Python
+    //in Python send_unencrypted_solidity(web3,contract,tender_id,user_id,unencrypted_message,separator) will become:
+    //bid_id = contract.functions.returningBidIdAddress(tender_id).call()
+    //web3.eth.defaultAccount=web3.eth.accounts[int(user_id)]
+    //contract.functions.concludeBid(tender_id,bid_id,unencrypted_message,separator)
     
-    //The following function returns the user_address related to a certain bidkey
-    //in python we will have to use the position of this address in the list web3.eth.accounts to access the account of the related user
-    // Python:
-    //1) user_address = contract.functions.returningBidderAddress(tenderKey,user_id).call()
-    //2) user_id = web3.eth.accounts.index(user_address)
-    //3) web3.eth.defaultAccount=web3.eth.accounts[int(user_id)]
-    
-    //the _bidkey parameter to be passed from Python when calling the following function is user_id
-    function returningBidderAddress (uint256 _tenderKey, uint32  _bidkey) public view returns(address) {
-        address user_address = tenders[_tenderKey].bids[_bidkey].contractor; 
+   
+    function returningBidIdAddress (uint256 _tenderKey) public view returns(uint) {
         
-        return (user_address);
+        uint bid_id = tenders[_tenderKey].bidIdFromAddress[msg.sender];
+        return(bid_id);
     }
     
     
