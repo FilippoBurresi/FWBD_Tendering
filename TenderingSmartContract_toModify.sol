@@ -98,7 +98,24 @@ contract TenderingSmartContract {
 
     }
     
-      modifier inTimeData (uint256 _tenderKey) {
+    //Instead of making a mapping for the address/bidkey thing we might do in the following way:
+    
+    //The following function returns the user_address related to a certain bidkey
+    //in python we will have to use the position of this address in the list web3.eth.accounts to access the account of the related user
+    // Python:
+    //1) user_address = contract.functions.returningBidderAddress(tenderKey,user_id).call()
+    //2) user_id = web3.eth.accounts.index(user_address)
+    //3) web3.eth.defaultAccount=web3.eth.accounts[int(user_id)]
+    
+    //the _bidkey parameter to be passed from Python when calling the following function is user_id
+    function returningBidderAddress (uint256 _tenderKey, uint32  _bidkey) public view returns(address) {
+        address user_address = tenders[_tenderKey].bids[_bidkey].contractor; 
+        
+        return (user_address);
+    }
+    
+    
+    modifier inTimeData (uint256 _tenderKey) {
         require(
         (now > tenders[_tenderKey].bidSubmissionClosingDateHash) && (now < tenders[_tenderKey].bidSubmissionClosingDateData),
         "The data has to be sent after the hash closing date and before the data closing date."
