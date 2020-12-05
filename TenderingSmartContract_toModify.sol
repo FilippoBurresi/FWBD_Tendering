@@ -1,7 +1,9 @@
-pragma solidity ^0.6.6;
+pragma solidity >0.4.0 <0.7.0;
 pragma experimental ABIEncoderV2;
 
-contract TenderingSmartContract {
+import "splitstring.sol";
+
+contract TenderingSmartContract is ContractString {
     
     
     address owner;
@@ -14,6 +16,11 @@ contract TenderingSmartContract {
         uint256 bidId;
         string description;
         bool valid;
+        string separator;
+        //mapping each bid id to its final description (the original splitted description)
+        //if we had description = '12####1283####è bello####'
+        //now we will have [12,1283,è bello] 
+        mapping(uint => string[]) NewDescription;
     }
 
     struct Tender {
@@ -29,6 +36,7 @@ contract TenderingSmartContract {
         mapping(address => uint) bidIdFromAddress;
         address tenderingInstitution;
         address winningContractor;
+        
     }
     
     mapping (uint => Tender) public tenders;
@@ -71,7 +79,6 @@ contract TenderingSmartContract {
     uint256 _daysUntilClosingDateData) public  onlyAllowed{
         tenders[tenderKeys].tenderName = _tenderName;
         tenders[tenderKeys].description = _description;
-        //Flavia: changed the 3 following  code lines
         tenders[tenderKeys].bidOpeningDate = now;
         tenders[tenderKeys].bidSubmissionClosingDateHash = now + (_daysUntilClosingDateHash * 1 days);
         tenders[tenderKeys].bidSubmissionClosingDateData = now + (_daysUntilClosingDateData * 1 days);
@@ -105,8 +112,8 @@ contract TenderingSmartContract {
     //The following function returns the bid_id of a certain address.
     //this bid_id has to be put in the concludeBid function when called from Python
     //in Python send_unencrypted_solidity(web3,contract,tender_id,user_id,unencrypted_message,separator) will become:
-    //bid_id = contract.functions.returningBidIdAddress(tender_id).call()
     //web3.eth.defaultAccount=web3.eth.accounts[int(user_id)]
+    //bid_id = contract.functions.returningBidIdAddress(tender_id).call()
     //contract.functions.concludeBid(tender_id,bid_id,unencrypted_message,separator)
     
    
@@ -137,9 +144,23 @@ contract TenderingSmartContract {
         assert (keccak256(abi.encodePacked(_description)) == tenders[_tenderKey].bids[_bidkey].hashOffer);
         // finally conclude the bid by submitting the restriction
         tenders[_tenderKey].bids[_bidkey].description = _description;
+        //memorizing the separator used in each bid
+        tenders[_tenderKey].bids[_bidkey].separator = _separator;
         tenders[_tenderKey].bids[_bidkey].valid = true;
 
     }
+    
+    //with this function each bid_id is assigned to a list of the elements presented in the original string-offer
+    
+    function SplitDescription(uint256 _tenderKey) public onlyAllowed {
+        for (uint i = 0; i < tenders[_tenderKey].bidList.length; i++){
+             string memory separatorToUse  = tenders[_tenderKey].bids[i].separator;
+            //UPDATE DESCRIPTION
+            string memory descriptionAtTheMoment = tenders[_tenderKey].bids[i].description;
+            tenders[_tenderKey].bids[i].NewDescription[i] = SMT(descriptionAtTheMoment,separatorToUse);
+        }
+    }
+    
 
     // after the deadline for submitting the actual offer the tendering organization can see all offer and assigned the
     // ! I didn't managed to declare this as a view function... 
