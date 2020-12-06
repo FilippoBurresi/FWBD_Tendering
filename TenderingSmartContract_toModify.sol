@@ -39,7 +39,7 @@ contract TenderingSmartContract is ContractString {
 
     // needed for the evaluation part
     mapping(uint => address[]) private _participants; //from tenderKey => list of participants
-    mapping(uint => uint[]) private _scores; //from tenderKey => list of scores
+    mapping(uint => uint[])  _scores; //from tenderKey => list of scores
     
     constructor()  public {
     owner = msg.sender;
@@ -157,28 +157,29 @@ contract TenderingSmartContract is ContractString {
         return result;
     }
     
-    function compute_scores(uint _tenderKey) onlyAllowed afterDeadline returns (address[], uint[]){
+    function compute_scores(uint _tenderKey) onlyAllowed afterDeadline(_tenderKey) {
         uint w1 = tenders[_tenderKey].evaluation_weights[0]; // weight associated to price
         uint w2 = tenders[_tenderKey].evaluation_weights[1]; // weight associated to timing 
         uint w3 = tenders[_tenderKey].evaluation_weights[2]; // weight associated to environmental safeguard level, i.e. four categories: 1 [highest] to 4 [lowest]
         
         for (uint i = 0; i < tenders[_tenderKey].bidList.length; i++){
-            if (tenders[_tenderKey].bids[tenders[_tenderKey].bidList[i]].valid == true){
+            address  target_address= tenders[_tenderKey].bidList[i];
+            BiddingOffer  memory to_store= tenders[_tenderKey].bids[target_address];
+            if (to_store.valid == true){
                 
-                uint price = stringToUint(tenders[_tenderKey].bids[tenders[_tenderKey].bidList[i]].NewDescription[0]);
-                uint timing = stringToUint(tenders[_tenderKey].bids[tenders[_tenderKey].bidList[i]].NewDescription[1]);
-                uint environment = stringToUint(tenders[_tenderKey].bids[tenders[_tenderKey].bidList[i]].NewDescription[2]);
+                uint price = stringToUint(to_store.NewDescription[0]);
+                uint timing = stringToUint(to_store.NewDescription[1]);
+                uint environment = stringToUint(to_store.NewDescription[2]);
                 
-                uint score = ((w1*price)+(w2*time)+(w3*environment)); // the lowest score will win the tendering
+                uint score = ((w1*price)+(w2*timing)+(w3*environment)); // the lowest score will win the tendering
                 
-               _participants[_tenderKey].push(tenders[_tenderKey].bids[tenders[_tenderKey].bidList[i]].contractor);
+               _participants[_tenderKey].push(to_store.contractor);
                _scores[_tenderKey].push(score);
             }
         }
-        return (_participants[_tenderKey], _scores[_tenderKey]);
     }
     
-    function assign_winner(uint _tenderKey) onlyAllowed afterDeadline returns (address, uint) {
+    function assign_winner(uint _tenderKey) onlyAllowed afterDeadline(_tenderKey) returns (address, uint) {
         uint winning_score = _scores[_tenderKey][0];
         uint winning_index = 0;
         
@@ -195,15 +196,15 @@ contract TenderingSmartContract is ContractString {
         return (_participants[_tenderKey][winning_index], winning_score);
     }
     
-    function getResultsLenght(uint _tenderKey) public view afterDeadline returns(uint) {
+    function getResultsLenght(uint _tenderKey) public view afterDeadline(_tenderKey) returns(uint) {
         return _participants[_tenderKey].length;
     }
     
-    function getResultsValue(uint _tenderKey, uint _index) public view afterDeadline returns (uint) {
+    function getResultsValue(uint _tenderKey, uint _index) public view afterDeadline(_tenderKey) returns (address,uint) {
         return (_participants[_tenderKey][_index], _scores[_tenderKey][_index]);
     }
 
-    function getBidDetails(uint _tenderKey, uint _index) public view afterDeadline returns (address, bytes32, bool, string[]) {
+    function getBidDetails(uint _tenderKey, address _index) public view afterDeadline(_tenderKey) returns (address, bytes32, bool, string[]) {
         address name_contractor = tenders[_tenderKey].bids[_index].contractor;
         bytes32 hash_offered = tenders[_tenderKey].bids[_index].hashOffer;
         bool is_valid = tenders[_tenderKey].bids[_index].valid;
