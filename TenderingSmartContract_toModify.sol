@@ -131,6 +131,7 @@ contract TenderingSmartContract is ContractString {
     //with this function each bid_id is assigned to a list of the elements presented in the original string-offer
     
     function SplitDescription(uint256 _tenderKey) public onlyAllowed {
+        require (now > tenders[_tenderKey].bidSubmissionClosingDateData, "The data closing date has not yet expired");
         for (uint i=0; i<tenders[_tenderKey].bidList.length; i++){
              string memory separatorToUse  = tenders[_tenderKey].bids[tenders[_tenderKey].bidList[i]].separator;
             //UPDATE DESCRIPTION
