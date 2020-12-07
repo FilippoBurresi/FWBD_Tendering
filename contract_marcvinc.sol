@@ -32,6 +32,7 @@ contract TenderingSmartContract  {
         uint[] evaluation_weights; // array of lenght=3 that stores the weights used for evaluation, i.e. weighted average
         address[] bidList; // array where to store all the addresses that are bidding
         mapping(address => BiddingOffer) bids; // from bidding address to its bidding offer
+        mapping(address => uint) addressToScore; // NEW! from bidding address to its score 
         address tenderingInstitution;
         address winningContractor;
     }
@@ -58,7 +59,7 @@ contract TenderingSmartContract  {
     event message(string message, address sender);
     event Winner_display(string, uint, address, uint); //title, tender_key, winner address, its score
 
-     modifier isOwner{
+    modifier isOwner{
         require(msg.sender == owner);
         _;
      }
@@ -111,25 +112,6 @@ contract TenderingSmartContract  {
         c.bidList.push(msg.sender);
     }
 
-
-    function SMT(string _phrase,string _separator ) public returns(string[] memory) {
-        strings.slice memory s = _phrase.toSlice();
-        strings.slice memory delim = _separator.toSlice();
-        string[] memory parts = new string[](s.count(delim));
-        for (uint i = 0; i < parts.length; i++) {
-           parts[i] = s.split(delim).toString();
-        }
-
-        return (parts);
-    }
-
-    //The following function returns the bid_id of a certain address.
-    //this bid_id has to be put in the concludeBid function when called from Python
-    //in Python send_unencrypted_solidity(web3,contract,tender_id,user_id,unencrypted_message,separator) will become:
-    //web3.eth.defaultAccount=web3.eth.accounts[int(user_id)]
-    //bid_id = contract.functions.returningBidIdAddress(tender_id).call()
-    //contract.functions.concludeBid(tender_id,bid_id,unencrypted_message,separator)
-
     modifier inTimeData (uint256 _tenderKey) {
         require(
         (now >= tenders[_tenderKey].bidSubmissionClosingDateHash) && (now < tenders[_tenderKey].bidSubmissionClosingDateData),
@@ -153,15 +135,19 @@ contract TenderingSmartContract  {
 
     }
 
+    function SMT(string _phrase,string _separator ) private returns(string[] memory) {
+        strings.slice memory s = _phrase.toSlice();
+        strings.slice memory delim = _separator.toSlice();
+        string[] memory parts = new string[](s.count(delim));
+        for (uint i = 0; i < parts.length; i++) {
+           parts[i] = s.split(delim).toString();
+        }
 
-    modifier afterDeadline (uint256 _tenderKey) {
-        assert(tenders[_tenderKey].bidSubmissionClosingDateData < now);
-        _;
+        return (parts);
     }
 
     //with this function each bid_id is assigned to a list of the elements presented in the original string-offer
-
-    function SplitDescription(uint256 _tenderKey) public onlyAllowed afterDeadline(_tenderKey) {
+    function splitDescription(uint256 _tenderKey) private onlyAllowed afterDeadline(_tenderKey) {
         for (uint i=0; i<tenders[_tenderKey].bidList.length; i++){
              string memory separatorToUse  = tenders[_tenderKey].bids[tenders[_tenderKey].bidList[i]].separator;
             //UPDATE DESCRIPTION
@@ -170,8 +156,12 @@ contract TenderingSmartContract  {
         }
     }
 
-
-    function stringToUint(string s) view returns (uint) {
+    modifier afterDeadline (uint256 _tenderKey) {
+        assert(tenders[_tenderKey].bidSubmissionClosingDateData < now);
+        _;
+    }
+    
+    function stringToUint(string s) private returns (uint) {
         bytes memory b = bytes(s);
         uint result = 0;
         for (uint i = 0; i < b.length; i++) {
@@ -187,6 +177,7 @@ contract TenderingSmartContract  {
         uint w2 = tenders[_tenderKey].evaluation_weights[1]; // weight associated to timing
         uint w3 = tenders[_tenderKey].evaluation_weights[2]; // weight associated to environmental safeguard level, i.e. four categories: 1 [highest] to 4 [lowest]
 
+        splitDescription(_tenderKey);
 
         for (uint i = 0; i < tenders[_tenderKey].bidList.length; i++){
             address  target_address= tenders[_tenderKey].bidList[i];
@@ -204,6 +195,7 @@ contract TenderingSmartContract  {
 
                _participants[_tenderKey].push(to_store.contractor);
                _scores[_tenderKey].push(score);
+               tenders[_tenderKey].addressToScore[to_store.contractor] = score;
             }
         }
     }
@@ -230,7 +222,6 @@ contract TenderingSmartContract  {
         return tenderIdToWinner[_tenderKey];
         /*
         Alternatively, we can simply return tenders[_tenderKey].winningContractor
-
         Check which option consumes less gas. And, if tenders[_tenderKey].winningContractor consumes less,
         we must eliminate the mapping tenderIdToWinner at the beginning of the smart contract
         */
@@ -240,48 +231,58 @@ contract TenderingSmartContract  {
         return _participants[_tenderKey].length;
     }
 
-    function getResultsValue(uint _tenderKey, uint _index) public view afterDeadline(_tenderKey) returns (address,uint) {
-        return (_participants[_tenderKey][_index], _scores[_tenderKey][_index]);
-    }
 
-    function getBidDetails(uint _tenderKey, address _index) public view afterDeadline(_tenderKey) returns (address, bytes32, bool, string[]) {
-        address name_contractor = tenders[_tenderKey].bids[_index].contractor;
-        bytes32 hash_offered = tenders[_tenderKey].bids[_index].hashOffer;
-        bool is_valid = tenders[_tenderKey].bids[_index].valid;
-        string[] text_description = tenders[_tenderKey].bids[_index].NewDescription;
-        return (name_contractor, hash_offered, is_valid, text_description);
-    }
-
-    function displayPendingTenders() public returns (string[], uint[], uint[], uint[], uint[], uint[], uint[]) {
-
-        string[] names;
-        //string[] info; in see_TenderDetails
-        uint[] ids;
-        uint[] closingHash;
-        uint[] closingData;
-        uint[] eval_weight1;
-        uint[] eval_weight2;
-        uint[] eval_weight3;
-        //uint[] num_bids; in see_TenderDetails
-
-        for (uint i = 0; i < tenderKeys; i++){
-            if (tenders[i].bidSubmissionClosingDateHash > now) {
-                names[i] = tenders[i].tenderName;
-                //info[i] = tenders[i].description;
-                ids[i] = tenders[i].tender_id;
-                closingHash[i] = tenders[i].bidSubmissionClosingDateHash;
-                closingData[i] = tenders[i].bidSubmissionClosingDateData;
-                eval_weight1[i] = tenders[i].evaluation_weights[0];
-                eval_weight2[i] = tenders[i].evaluation_weights[1];
-                eval_weight3[i] = tenders[i].evaluation_weights[2];
-                //num_bids[i] = tenders[i].bidList.length;
-            }
+    function getResultsValue(uint _tenderKey, uint _index) public view afterDeadline(_tenderKey) returns (address,uint, bool) {
+        
+        bool is_winner;
+        if (tenders[_tenderKey].winningContractor == _participants[_tenderKey][_index]) {
+            is_winner = true;
+        } else {
+            is_winner = false;
         }
-        return (names, ids, closingHash, closingData, eval_weight1, eval_weight2, eval_weight3);
+        
+        return (_participants[_tenderKey][_index], _scores[_tenderKey][_index], is_winner);
     }
 
-    function see_TenderDetails(uint _tenderKey) public returns (uint  tender_id, string memory tenderName,string memory description, address[] memory bidList){
-        return (tenders[_tenderKey].tender_id, tenders[_tenderKey].tenderName, tenders[_tenderKey].description, tenders[_tenderKey].bidList);
+    function getBidDetails(uint _tenderKey, address _index) public view afterDeadline(_tenderKey) returns (address, string[], string, uint, bool) {
+        address name_contractor = tenders[_tenderKey].bids[_index].contractor;
+        string[] text_description = tenders[_tenderKey].bids[_index].NewDescription;
+        string sep = tenders[_tenderKey].bids[_index].separator; // thus, one can check if the score was correct by using the separator and the description
+        
+        bool is_winner;
+        if (tenders[_tenderKey].winningContractor == _index) {
+            is_winner = true;
+        } else {
+            is_winner = false;
+        }
+        
+        // the index is an address so I needed to create this mapping inside Tender to retrieve the score by the given address
+        uint score = tenders[_tenderKey].addressToScore[_index];
+         
+        return (name_contractor, text_description, sep, score, is_winner);
+    }
+
+    function getTendersLength() public view returns(uint) {
+        return tenderKeys;
+    }
+    
+    function isPending(uint _tenderKey) public returns(uint, bool) {
+        
+        bool pending_status;
+        
+        if (tenders[_tenderKey].bidSubmissionClosingDateHash > now) {
+            pending_status = true;
+        } else {
+            pending_status = false;
+        }
+        return (_tenderKey, pending_status);
+    }
+    
+    
+    function see_TenderDetails(uint _tenderKey) public returns (uint  tender_id, string memory tenderName,string memory description, 
+                                uint[] memory evaluation_weights, address[] memory bidList){
+                                    
+        return (tenders[_tenderKey].tender_id, tenders[_tenderKey].tenderName, tenders[_tenderKey].description, tenders[_tenderKey].evaluation_weights, tenders[_tenderKey].bidList);
 
         /*
         Now, this function returns the list of all the contractors that sent a bid.
@@ -290,3 +291,4 @@ contract TenderingSmartContract  {
     }
 
 }
+
