@@ -39,7 +39,13 @@ contract TenderingSmartContract is ContractString {
 
     // needed for the evaluation part
     mapping(uint => address[]) private _participants; //from tenderKey => list of participants
-    mapping(uint => uint[])  _scores; //from tenderKey => list of scores
+    mapping(uint => uint[])  private _scores; //from tenderKey => list of scores
+    
+    
+    // added this for the displayWinner function below. See there for more details
+    mapping(uint => address) tenderIdToWinner; // from tenderId => address of the winner
+    
+    
     
     constructor()  public {
     owner = msg.sender;
@@ -192,8 +198,19 @@ contract TenderingSmartContract is ContractString {
             }
         }
         tenders[_tenderKey].winningContractor = _participants[_tenderKey][winning_index];
+        tenderIdToWinner[_tenderKey] = _participants[_tenderKey][winning_index];
         emit Winner_display("We have a winner!", _tenderKey, _participants[_tenderKey][winning_index], winning_score);
         return (_participants[_tenderKey][winning_index], winning_score);
+    }
+    
+    function displayWinner(uint _tenderKey) afterDeadline(_tenderKey) returns (address) {
+        return tenderIdToWinner[_tenderKey];
+        /*
+        Alternatively, we can simply return tenders[_tenderKey].winningContractor
+        
+        Check which option consumes less gas. And, if tenders[_tenderKey].winningContractor consumes less, 
+        we must eliminate the mapping tenderIdToWinner at the beginning of the smart contract
+        */
     }
     
     function getResultsLenght(uint _tenderKey) public view afterDeadline(_tenderKey) returns(uint) {
@@ -212,12 +229,43 @@ contract TenderingSmartContract is ContractString {
         return (name_contractor, hash_offered, is_valid, text_description); 
     }
     
+    function displayPendingTenders() public returns (string[], uint[], uint[], uint[], uint[], uint[], uint[]) {
+        
+        string[] names; 
+        //string[] info; in see_TenderDetails
+        uint[] ids;
+        uint[] closingHash;
+        uint[] closingData;
+        uint[] eval_weight1;
+        uint[] eval_weight2;
+        uint[] eval_weight3;
+        //uint[] num_bids; in see_TenderDetails
+        
+        for (uint i = 0; i < tenderKeys; i++){
+            if (tenders[i].bidSubmissionClosingDateHash > now) {
+                names[i] = tenders[i].tenderName;
+                //info[i] = tenders[i].description;
+                ids[i] = tenders[i].tender_id;
+                closingHash[i] = tenders[i].bidSubmissionClosingDateHash;
+                closingData[i] = tenders[i].bidSubmissionClosingDateData;
+                eval_weight1[i] = tenders[i].evaluation_weights[0];
+                eval_weight2[i] = tenders[i].evaluation_weights[1];
+                eval_weight3[i] = tenders[i].evaluation_weights[2];
+                //num_bids[i] = tenders[i].bidList.length;
+            }
+        }
+        return (names, ids, closingHash, closingData, eval_weight1, eval_weight2, eval_weight3);
+    }
     
-    function see_tender(uint _tenderId) public returns (uint  tender_id, string memory tenderName,string memory description,
-    uint256 bidOpeningDate,uint256 bidSubmissionClosingDateData,address[] memory bidList, BiddingOffer memory){
-        BiddingOffer memory to_store= tenders[_tenderId].bids[tenders[_tenderId].bidList[0]];
-        return (tenders[_tenderId].tender_id,tenders[_tenderId].tenderName,tenders[_tenderId].description,
-        tenders[_tenderId].bidOpeningDate,tenders[_tenderId].bidSubmissionClosingDateData,tenders[_tenderId].bidList,to_store);
+    function see_TenderDetails(uint _tenderKey) public returns (uint  tender_id, string memory tenderName,string memory description, address[] memory bidList){
+        return (tenders[_tenderKey].tender_id, tenders[_tenderKey].tenderName, tenders[_tenderKey].description, tenders[_tenderKey].bidList);
+        
+        /*
+        Now, this function returns the list of all the contractors that sent a bid. 
+        Check if it is better for gas costs returning only the length of bidList instead of all the addresses.
+        */
     }
 
 }
+
+
