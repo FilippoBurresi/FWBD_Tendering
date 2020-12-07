@@ -541,16 +541,18 @@ def create_tender_solidity(web3,contract,tender_name,description,n_days_1,n_days
     
     
 
-def allowed_companies_ids(web3,contract,list_allowed):
+def allowed_companies_ids(web3,contract,input_dict):
+    list_allowed=input_dict["allowed_companies"].get().split(",")
     for i in list_allowed:
-        contract.functions.CreatePA(web3.eth.accounts[i]).transact()
+        contract.functions.CreatePA(web3.eth.accounts[int(i)]).transact()
         
 
-def assign_winner(web3,contract,tender_id):
+def assign_winner(web3,contract,input_dict):
+    tender_id=int(input_dict["tender_id"].get())
     web3.eth.defaultAccount=web3.eth.accounts[0]
     contract.functions.compute_scores(tender_id).transact()
     contract.functions.assign_winner(tender_id).transact()
-    winning_address=contract.functions.displayWinner(tender_id).call()
+    winning_address,score=contract.functions.displayWinner(tender_id).call()
     return web3.eth.accounts.index(winning_address)
 
 
@@ -558,39 +560,49 @@ def assign_winner(web3,contract,tender_id):
 
 
 ##### CITIZEN INTERFACE
-
-
-def see_bids(tender_id):
-    ##dont' know how to retrieve all bids for now only first
-    contract.functions.see_tender(tender_id).call()
-
+def get_tenders_status(web3,contract):
+    num_tenders=contract.functions.getTendersLenght().call()
+    l=[]
+    for i in range(num_tenders):
+        key,status=contract.functions.isPending(i).call()
+        list=see_TenderDetails(i).call()
+        list+=status
+        l.append(list)
+    df=pd.Dataframe(l,columns=["tender_id","name","description","weights","bid_list","pending?"])
+    
+  
 def see_active_tenders(web3,contract):
-    return contract.functions.displayPendingTenders().call()
+    df=get_tenders_status(web3,contract)
+    return df[df["pending?"]==True]
+
+    
+def see_closed_tenders(web3,contract):
+    df=get_tenders_status(web3,contract)
+    return df[df["pending?"]==False]
     
 def get_bids_details(web3,contract,tender_id):
+    #### io clicco sul df delle closed tenders su una riga 
+    #e vado su questa nuova view: fattibile?come prendo input?
     num_bids=contract.functions.getResultsLenght(tender_id).call()
     bids_list=[]
     for i in range(0,num_bids):
-        address,score=contract.functions.getResultsValue(tender_id,i).call()
         bids_list.append(contract.functions.getBidDetails(tender_id,address).call())
-    return bids_list
+    df = pd.DataFrame(bids_list,columns=["name","description","separator","score","winner?"])
+    return df
+
     
-def see_closed_tenders(web3,contract):
-    return contract.functions.displayClosedTenders().call()
 
     
     
 #### COMPANIES INTERFACE
 
-def send_bid(input_dict,web3,contract,allowed_companies):
-    #inputdict={"user_id":"1","tender_id":"11","price":"38448","description":"blablabla","time":"120","envir":"4"}
-    user_id=input_dict["user_id"].text
-    assert user_id in allowed_companies, "company is not allowed"
-    tender_id=input_dict["tender_id"].text
-    price=input_dict["price"].text
-    time=input_dict["time"].text
-    envir=input_dict["envir"].text
-    description=input_dict["description"].text
+def send_bid(input_dict,web3,contract):
+    #inputdict={"user_id":"1","tender_id":"11","price":"38448","time":"120","envir":"4"}
+    user_id=int(input_dict["user_id"].get())
+    tender_id=int(input_dict["tender_id"].get())
+    price=input_dict["price"].get()
+    time=input_dict["time"].get()
+    envir=input_dict["envir"].get()
     
     list_values_to_hash=[price,time,envir]
     unencrypted_message,separator=to_string_and_sep(list_values_to_hash)
@@ -600,6 +612,7 @@ def send_bid(input_dict,web3,contract,allowed_companies):
     save_txt(user_id,separator,unencrypted_message,tender_id)
     
 def send_unencrypted(web3,contract,user_id):
+    ##come funziona qua per l'input con il txt?
     tender_id,user_id,unencrypted_message,separator=load_txt(user_id)
     send_unencrypted_solidity(web3,contract,tender_id,user_id,unencrypted_message,separator)
 
