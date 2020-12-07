@@ -86,7 +86,7 @@ my_canvas_citizen.bind('<Configure>', lambda e: my_canvas_citizen.configure(scro
 
 second_frame_citizen = Frame(my_canvas_citizen)
 
-my_canvas_citizen.create_window((0,0),window=second_frame_citizen, anchor ="nw")
+my_canvas_citizen.create_window((0,0),window=second_frame, anchor ="nw")
 
 # creating link the function to the user interface
 
