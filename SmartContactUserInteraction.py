@@ -6,15 +6,16 @@ from web3 import Web3
 import json
 import string
 import random
+from utils import *
 
 # COMUNICATE TO ETHEREUM
 
-ganache_URL="HTTP://127.0.0.1:7545"
-web3=Web3(Web3.HTTPProvider(ganache_URL))
-web3.eth.defaultAccount=web3.eth.accounts[0]
-abi=json.loads(abi) # we can change the name of the variable
-address=web3.toChecksumAddress("0x46D841b6900e2BF0925C248B7942D8B09a354E37")
-contract=web3.eth.contract(address=address,abi=abi)
+# ganache_URL="HTTP://127.0.0.1:7545"
+# web3=Web3(Web3.HTTPProvider(ganache_URL))
+# web3.eth.defaultAccount=web3.eth.accounts[0]
+# abi=json.loads(abi) # we can change the name of the variable
+# address=web3.toChecksumAddress("0x46D841b6900e2BF0925C248B7942D8B09a354E37")
+# contract=web3.eth.contract(address=address,abi=abi)
 
 # USER INTERFACE
 
@@ -42,7 +43,7 @@ main_frame_PA.pack(fill=BOTH, expand = 1)
 my_canvas_PA = Canvas(main_frame_PA)
 my_canvas_PA.pack(side=LEFT, fill=BOTH, expand=1)
 
-my_scrollbar_PA = ttk.Scrollbar(main_frame, orient=VERTICAL, command=my_canvas_PA.yview)
+my_scrollbar_PA = ttk.Scrollbar(main_frame_PA, orient=VERTICAL, command=my_canvas_PA.yview)
 my_scrollbar_PA.pack(side=RIGHT, fill=Y)
 
 my_canvas_PA.configure(yscrollcommand=my_scrollbar_PA.set)
@@ -50,11 +51,11 @@ my_canvas_PA.bind('<Configure>', lambda e: my_canvas_PA.configure(scrollregion =
 
 second_frame_PA = Frame(my_canvas_PA)
 
-my_canvas.create_window((0,0),window=second_frame_PA, anchor ="nw")
+my_canvas_PA.create_window((0,0),window=second_frame_PA, anchor ="nw")
 
 # (CONTRACTOR)
 
-main_frame_contractor = Frame(tab_pa)
+main_frame_contractor = Frame(tab_contractor)
 main_frame_contractor.pack(fill=BOTH, expand = 1)
 
 my_canvas_contractor = Canvas(main_frame_contractor)
@@ -72,7 +73,7 @@ my_canvas_contractor.create_window((0,0),window=second_frame_contractor, anchor 
 
 # (CITIZEN)
 
-main_frame_citizen = Frame(tab_pa)
+main_frame_citizen = Frame(tab_citizen)
 main_frame_citizen.pack(fill=BOTH, expand = 1)
 
 my_canvas_citizen = Canvas(main_frame_citizen)
@@ -86,7 +87,9 @@ my_canvas_citizen.bind('<Configure>', lambda e: my_canvas_citizen.configure(scro
 
 second_frame_citizen = Frame(my_canvas_citizen)
 
-my_canvas_citizen.create_window((0,0),window=second_frame, anchor ="nw")
+my_canvas_citizen.create_window((0,0),window=second_frame_citizen, anchor ="nw")
+
+env1 = makeform(second_frame_contractor, ('Primo','Secondo','Terzo'))
 
 # creating link the function to the user interface
 
