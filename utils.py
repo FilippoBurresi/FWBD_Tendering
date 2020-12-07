@@ -566,10 +566,10 @@ def get_tenders_status(web3,contract):
     for i in range(num_tenders):
         key,status=contract.functions.isPending(i).call()
         list=see_TenderDetails(i).call()
-        list+=status
+        list.append(status)
         l.append(list)
     df=pd.Dataframe(l,columns=["tender_id","name","description","weights","bid_list","pending?"])
-    
+    return df
   
 def see_active_tenders(web3,contract):
     df=get_tenders_status(web3,contract)
