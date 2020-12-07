@@ -360,24 +360,32 @@ abi = """[
 ]"""
 
 # Web3 function
+
+#### PA INTERFACE
+
+
+
 def create_tender(web3,contract,input_dict_pa):
     ## non capisco tender_keys // tender_id, come funzionano ?? ho messo come input anche ID TENDER
-    ###input_dict_pa={"tender_name":"ponte di messina","description":"blablabla","n_days1":"1";"n_days2":"2"}
-    ##_daysUntilClosingDateHash,_daysUntilClosingDateData ???
+    ###input_dict_pa={"tender_name":"ponte di messina","description":"blablabla","n_days1":"1";"n_days2":"2","weight_price":"0.3"
+    #,"weight_time":"0.1","weight_environment":0.6}
     tender_name=input_dict_pa["tender_name"].text
     description=input_dict_pa["description"].text
     n_days_1=input_dict_pa["n_days"].text
-    n_days_2=input_dict_pa["n_days"].text
-    create_tender_solidity(web3,contract,tender_name,description,n_days)
+    n_days_2=input_dict_pa["n_days_2"].text
+    n_days_2=input_dict_pa["n_days_2"].text
+    weight_1_price=input_dict_pa["weight_1_price"].text
+    weight_2_time=input_dict_pa["weight_2_time"].text
+    weight_3_envir=input_dict_pa["weight_3_envir"].text
+    create_tender_solidity(web3,contract,tender_name,description,n_days_1,n_days_2,weight_1_price,weight_2_time,weight_3_envir)
     
-def create_tender_solidity(web3,contract,tender_name,description,n_days):
+def create_tender_solidity(web3,contract,tender_name,description,n_days_1,n_days_2,weight_1_price,weight_2_time,weight_3_envir):
     web3.eth.defaultAccount=web3.eth.accounts[0]
-    contract.functions.CreateTender(tender_name,description,n_days).transact()
+    contract.functions.CreateTender(tender_name,description,n_days_1,n_days_2,weight_1_price,weight_2_time,weight_3_envir).transact()
     
     
     
     
-list_allowed=[i for i in range(1,9)]
 
 def allowed_companies_ids(web3,contract,list_allowed):
     for i in list_allowed:
@@ -385,37 +393,52 @@ def allowed_companies_ids(web3,contract,list_allowed):
         
 
 def assign_winner(web3,contract,tender_id):
-    ##da creare funzione che restituisce bid_address di chi ha il prezzo più basso?
     web3.eth.defaultAccount=web3.eth.accounts[0]
-    winner_address=contract.functions.decide_winner(tender_id).transact() ##to_do
-    contract.functions.assignWinningContractor(tender_id,winner_address).transact()
+    contract.functions.compute_scores(tender_id).transact()
+    contract.functions.assign_winner(tender_id).transact()
+    winning_address=contract.functions.displayWinner(tender_id).call()
+    return web3.eth.accounts.index(winning_address)
 
-def see_active_tenders(web3,contract):
-    ###dovrebbe tornare una tupla to_do_in_solidity
-    return contract.functions.see_active_tenders().call()  ###to do
-    
+
 
 
 
 ##### CITIZEN INTERFACE
 
 
-def see_tender(tender_id):
+def see_bids(tender_id):
     ##dont' know how to retrieve all bids for now only first
     contract.functions.see_tender(tender_id).call()
 
+def see_active_tenders(web3,contract):
+    return contract.functions.displayPendingTenders().call()
+    
+def get_bids_details(web3,contract,tender_id):
+    num_bids=contract.functions.getResultsLenght(tender_id).call()
+    bids_list=[]
+    for i in range(0,num_bids):
+        address,score=contract.functions.getResultsValue(tender_id,i).call()
+        bids_list.append(contract.functions.getBidDetails(tender_id,address).call())
+    return bids_list
+    
+def see_closed_tenders(web3,contract):
+    return contract.functions.displayClosedTenders().call()
 
+    
+    
 #### COMPANIES INTERFACE
 
 def send_bid(input_dict,web3,contract,allowed_companies):
-    #inputdict={"user_id":"1","tender_id":"11","price":"38448","description":"blablabla"}
+    #inputdict={"user_id":"1","tender_id":"11","price":"38448","description":"blablabla","time":"120","envir":"4"}
     user_id=input_dict["user_id"].text
     assert user_id in allowed_companies, "company is not allowed"
     tender_id=input_dict["tender_id"].text
     price=input_dict["price"].text
+    time=input_dict["time"].text
+    envir=input_dict["envir"].text
     description=input_dict["description"].text
     
-    list_values_to_hash=[tender_id,price,description]
+    list_values_to_hash=[price,time,envir]
     unencrypted_message,separator=to_string_and_sep(list_values_to_hash)
     hash=encrypt(unencrypted_message)
     
@@ -436,7 +459,7 @@ def to_string_and_sep(l):
     while True:
         separator=get_random_separator()
         if separator not in s:
-            unencrypted_message=separator.join(l)
+            unencrypted_message=separator.join(l)+separator
             print(unencrypted_message,separator)
             return unencrypted_message,separator
 
@@ -471,6 +494,7 @@ def send_unencrypted_solidity(web3,contract,tender_id,user_id,unencrypted_messag
     web3.eth.defaultAccount=web3.eth.accounts[int(user_id)]
     bid_id = contract.functions.returningBidIdAddress(tender_id).call()
     contract.functions.concludeBid(tender_id,unencrypted_message,separator).transact()
+    
 
 
 # User interface
