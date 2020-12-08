@@ -7,6 +7,8 @@ import json
 import string
 import random
 
+
+filename = "/"
 abi = """[
 	{
 		"constant": false,
@@ -513,6 +515,12 @@ abi = """[
 	}
 ]"""
 
+function_info = {'CreateTender': "questa è la descrizione di create tender",
+			   'placeBid': 'questa è la descrizione per plaeBid',
+			   'concludeBid': 'questa è la descrizione per conclude bid',
+			   'getTenderStatus': 'questa è la descrizione per get tender status vediamo come viene',
+			   'seeActiveTenders': 'questa è la descrizione per see active tenders vediamo come viene se la faccio più lunga',
+			   'seeClosedTenders': 'questa è la descrizione per see closed tenders vediamo come viene'}
 # Web3 function
 
 #### PA INTERFACE
@@ -560,35 +568,76 @@ def assign_winner(web3,contract,input_dict):
 
 
 ##### CITIZEN INTERFACE
-def get_tenders_status(web3,contract):
-    num_tenders=contract.functions.getTendersLenght().call()
-    l=[]
-    for i in range(num_tenders):
-        key,status=contract.functions.isPending(i).call()
-        list=see_TenderDetails(i).call()
-        list.append(status)
-        l.append(list)
-    df=pd.Dataframe(l,columns=["tender_id","name","description","weights","bid_list","pending?"])
-    return df
+def get_tenders_status(web3,contract, input_dict):
+	num_tenders=contract.functions.getTendersLenght().call()
+	l=[]
+	for i in range(num_tenders):
+		key,status=contract.functions.isPending(i).call()
+		list=see_TenderDetails(i).call()
+		list.append(status)
+		l.append(list)	
+	df=pd.Dataframe(l,columns=["tender_id","name","description","weights","bid_list","pending?"])
+	
+	# #from here the code "print" the dataframe
+	# input_dict['tv1']["column"] = list(df.columns)
+	# input_dict['tv1']["show"] = "headings"
+	# for column in input_dict['tv1']["columns"]:
+	# 	input_dict['tv1'].heading(column, text=column) # let the column heading = column name
+
+	# df_rows = df.to_numpy().tolist() # turns the dataframe into a list of lists
+	# for row in df_rows:
+	# 	input_dict['tv1'].insert("", "end", values=row)
+	
+	return df
   
-def see_active_tenders(web3,contract):
-    df=get_tenders_status(web3,contract)
-    return df[df["pending?"]==True]
+def see_active_tenders(web3,contract, input_dict):
+	df=get_tenders_status(web3,contract)
+	df = df[df["pending?"]==True]
+	#from here the code "print" the dataframe
+	input_dict['tv1']["column"] = list(df.columns)
+	input_dict['tv1']["show"] = "headings"
+	for column in input_dict['tv1']["columns"]:
+		input_dict['tv1'].heading(column, text=column) # let the column heading = column name
+
+	df_rows = df.to_numpy().tolist() # turns the dataframe into a list of lists
+	for row in df_rows:
+		input_dict['tv1'].insert("", "end", values=row)
 
     
-def see_closed_tenders(web3,contract):
-    df=get_tenders_status(web3,contract)
-    return df[df["pending?"]==False]
+def see_closed_tenders(web3,contract, input_dict):
+	df=get_tenders_status(web3,contract)
+	df = df[df["pending?"]==False]
+	#from here the code "print" the dataframe
+	input_dict['tv1']["column"] = list(df.columns)
+	input_dict['tv1']["show"] = "headings"
+	for column in input_dict['tv1']["columns"]:
+		input_dict['tv1'].heading(column, text=column) # let the column heading = column name
+
+	df_rows = df.to_numpy().tolist() # turns the dataframe into a list of lists
+	for row in df_rows:
+		input_dict['tv1'].insert("", "end", values=row)
+
     
-def get_bids_details(web3,contract,tender_id):
-    #### io clicco sul df delle closed tenders su una riga 
-    #e vado su questa nuova view: fattibile?come prendo input?
-    num_bids=contract.functions.getResultsLenght(tender_id).call()
-    bids_list=[]
-    for i in range(0,num_bids):
-        bids_list.append(contract.functions.getBidDetails(tender_id,address).call())
-    df = pd.DataFrame(bids_list,columns=["name","description","separator","score","winner?"])
-    return df
+def get_bids_details(web3,contract,input_dict):
+	#### io clicco sul df delle closed tenders su una riga 
+	#e vado su questa nuova view: fattibile?come prendo input?
+	tender_id = int(input_dict['tender_id'].get())
+	num_bids=contract.functions.getResultsLenght(tender_id).call()
+	bids_list=[]
+	for i in range(0,num_bids):
+		bids_list.append(contract.functions.getBidDetails(tender_id,address).call())
+	df = pd.DataFrame(bids_list,columns=["name","description","separator","score","winner?"])
+
+	# input_dict['tv1']["column"] = list(df.columns)
+	# input_dict['tv1']["show"] = "headings"
+	# for column in input_dict['tv1']["columns"]:
+	# 	input_dict['tv1'].heading(column, text=column) # let the column heading = column name
+
+	# df_rows = df.to_numpy().tolist() # turns the dataframe into a list of lists
+	# for row in df_rows:
+	# 	input_dict['tv1'].insert("", "end", values=row)
+
+	return df
 
     
 
@@ -596,7 +645,7 @@ def get_bids_details(web3,contract,tender_id):
     
 #### COMPANIES INTERFACE
 
-def send_bid(input_dict,web3,contract):
+def send_bid(web3,contract, input_dict):
     #inputdict={"user_id":"1","tender_id":"11","price":"38448","time":"120","envir":"4"}
     user_id=int(input_dict["user_id"].get())
     tender_id=int(input_dict["tender_id"].get())
@@ -609,12 +658,13 @@ def send_bid(input_dict,web3,contract):
     hash=encrypt(unencrypted_message)
     
     send_bid_solidity(web3,contract,user_id,tender_id,hash)
-    save_txt(user_id,separator,unencrypted_message,tender_id)
+    save_txt(str(user_id),str(separator),unencrypted_message,str(tender_id))
     
-def send_unencrypted(web3,contract,user_id):
-    ##come funziona qua per l'input con il txt?
-    tender_id,user_id,unencrypted_message,separator=load_txt(user_id)
-    send_unencrypted_solidity(web3,contract,tender_id,user_id,unencrypted_message,separator)
+def send_unencrypted(web3,contract, input_dict):
+	user_id = int(input_dict['user_id'].get())
+	##come funziona qua per l'input con il txt?
+	tender_id,unencrypted_message,separator=load_txt()
+	send_unencrypted_solidity(web3,contract,tender_id,user_id,unencrypted_message,separator)
 
 
 
@@ -649,12 +699,15 @@ def save_txt(user_id,separator,unencrypted_message,tender_id):
     file.writelines([separator+"\n",unencrypted_message+"\n",tender_id])
     file.close()
     
-def load_txt(user_id):
-    file=open("offer_{}.txt".format(user_id),"r")
-    separator,unencrypted_message,tender_id=[i.replace("\n","") for i in file.readlines()]
-    file.close()
-    print(separator,unencrypted_message,tender_id)
-    return tender_id,user_id,unencrypted_message,separator
+def load_txt():
+	global filename
+	print(filename)
+	file=open(filename,"r")
+	
+	separator,unencrypted_message,tender_id=[i.replace("\n","") for i in file.readlines()]
+	file.close()
+	print(separator,unencrypted_message,tender_id)
+	return tender_id,unencrypted_message,separator
 
 def send_unencrypted_solidity(web3,contract,tender_id,user_id,unencrypted_message,separator):
     
@@ -666,66 +719,71 @@ def send_unencrypted_solidity(web3,contract,tender_id,user_id,unencrypted_messag
 
 # User interface
 def makeform(root, fields, title="Lorem Ipsum", description="Lorem Ipsum description",view = False, file = False):
-    def fileDialog():
-        global filename
-        filename = filedialog.askopenfilename(initialdir ="/", title = "Select a file") #, filetype = (('text files', 'txt'),)
+	def fileDialog(v):
+		global filename
+		filename = filedialog.askopenfilename(initialdir ="/", title = "Select a file") #, filetype = (('text files', 'txt'),)
+		v.set(filename)
+	global filename
+	entries = {}
+	row = Frame(root)
+	row.pack(fill = X, padx = 5, pady = 5)
+	lab = Label(row, text = title,font=(None, 15) ,)
+	lab.pack(side=LEFT)
+	row = Frame(root)
+	row.pack(fill = X, padx = 5, pady = 5)
+	lab = Label(row, text = description,font=(None, 10), wraplength = 450, justify = LEFT )
+	lab.pack(side=LEFT)
+	for field in fields:
+		row = Frame(root)
+		lab = Label(row, width=22, text=field+": ", anchor='w')
+		ent = Entry(row, width=40)
+		ent.insert(0,"0")
+		row.pack(side = TOP, fill = X, padx = 5 , pady = 5)
+		lab.pack(side = LEFT,fill = X, padx = 10 , pady = 0)
+		ent.pack(side = RIGHT, expand = YES, fill = X)
+		entries[field] = ent
+	if view:
+		row = LabelFrame(root, text="Excel Data", height=250, width=600)
+		sub_row1 = Frame(row)
+		sub_row2 = Frame(row)
+		tv1 = ttk.Treeview(sub_row1)   
+		treescrolly = Scrollbar(sub_row1, orient="vertical", command=tv1.yview) 
+		treescrollx = Scrollbar(sub_row2, orient="horizontal", command=tv1.xview) 
+		tv1.configure(xscrollcommand=treescrollx.set, yscrollcommand=treescrolly.set)
 
-    entries = {}
-    row = Frame(root)
-    row.pack(fill = X, padx = 5, pady = 5)
-    lab = Label(row, text = title,font=(None, 15) )
-    lab.pack(side=LEFT)
-    row = Frame(root)
-    row.pack(fill = X, padx = 5, pady = 5)
-    lab = Label(row, text = description,font=(None, 10) )
-    lab.pack(side=LEFT)
-    for field in fields:
-        row = Frame(root)
-        lab = Label(row, width=22, text=field+": ", anchor='w')
-        ent = Entry(row, width=40)
-        ent.insert(0,"0")
-        row.pack(side = TOP, fill = X, padx = 5 , pady = 5)
-        lab.pack(side = LEFT,fill = X, padx = 10 , pady = 0)
-        ent.pack(side = RIGHT, expand = YES, fill = X)
-        entries[field] = ent
-    if view:
-        row = LabelFrame(root, text="Excel Data", height=250, width=600)
-        sub_row1 = Frame(row)
-        sub_row2 = Frame(row)
-        tv1 = ttk.Treeview(sub_row1)   
-        treescrolly = Scrollbar(sub_row1, orient="vertical", command=tv1.yview) 
-        treescrollx = Scrollbar(sub_row2, orient="horizontal", command=tv1.xview) 
-        tv1.configure(xscrollcommand=treescrollx.set, yscrollcommand=treescrolly.set)
+		row.pack(side = TOP, fill = X, expand = True,  padx = 5 , pady = 5) #,  padx = 5 , pady = 5
+		sub_row1.pack(side = TOP, fill = X, expand = True,  padx = 5 , pady = 5)
+		tv1.pack(side = LEFT, fill = X, expand = True,  padx = 5 , pady = 5) #, padx = 5 , pady = 5     
+		treescrolly.pack(side="left", fill="y")
+		#row.pack(side = BOTTOM, fill = X, padx = 5 , pady = 5) 
+		sub_row2.pack(side = TOP, fill = X, expand = True,  padx = 5 , pady = 5)
+		treescrollx.pack(side="bottom", fill="x")   
 
-        row.pack(side = TOP, fill = X, expand = True,  padx = 5 , pady = 5) #,  padx = 5 , pady = 5
-        sub_row1.pack(side = TOP, fill = X, expand = True,  padx = 5 , pady = 5)
-        tv1.pack(side = LEFT, fill = X, expand = True,  padx = 5 , pady = 5) #, padx = 5 , pady = 5     
-        treescrolly.pack(side="left", fill="y")
-        #row.pack(side = BOTTOM, fill = X, padx = 5 , pady = 5) 
-        sub_row2.pack(side = TOP, fill = X, expand = True,  padx = 5 , pady = 5)
-        treescrollx.pack(side="bottom", fill="x")   
+		entries['tv1'] = tv1
 
-        entries['tv1'] = tv1
     # button to search a file
-    if file:
-        row = Frame(root)
-        btn = Button(row, text = "File", height=2, width=12, command = fileDialog)
-        row.pack(side=TOP, fill=X, expand = True)
-        btn.pack(side= LEFT,padx = 5 , pady = 5)
+	if file:
+		row = Frame(root)
+		v = StringVar()
+		lab = Label(row, textvariable = v)
+		btn = Button(row, text = "File", height=2, width=12, command = lambda arg1=v : fileDialog(arg1))
+		row.pack(side=TOP, fill=X, expand = True)
+		btn.pack(side= LEFT,padx = 5 , pady = 5)		
+		lab.pack(side=LEFT)
+
         
     # button to call the
-    row = Frame(root)
-    btn = Button(row, text = "Call", height=2, width=12)
-    row.pack(side=TOP, fill=X, expand = True)
-    btn.pack(side= LEFT,padx = 5 , pady = 5)
-    entries["btn"]=btn
+	row = Frame(root)
+	btn = Button(row, text = "Call", height=2, width=12)
+	row.pack(side=TOP, fill=X, expand = True)
+	btn.pack(side= LEFT,padx = 5 , pady = 5)
+	entries["btn"]=btn
     
     # button to call the function
-    row = Frame(root)
-    s = ttk.Separator(row, orient=HORIZONTAL )
-    row.pack(fill=X,padx = 5 , pady = 5)
-    s.pack(fill = X)
+	row = Frame(root)
+	s = ttk.Separator(row, orient=HORIZONTAL )
+	row.pack(fill=X,padx = 5 , pady = 5)
+	s.pack(fill = X)
     
     
-
-    return entries
+	return entries
