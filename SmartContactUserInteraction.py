@@ -7,15 +7,14 @@ import json
 import string
 import random
 from utils import *
-
 # COMUNICATE TO ETHEREUM
 
-# ganache_URL="HTTP://127.0.0.1:7545"
-# web3=Web3(Web3.HTTPProvider(ganache_URL))
-# web3.eth.defaultAccount=web3.eth.accounts[0]
-# abi=json.loads(abi) # we can change the name of the variable
-# address=web3.toChecksumAddress("0x46D841b6900e2BF0925C248B7942D8B09a354E37")
-# contract=web3.eth.contract(address=address,abi=abi)
+ganache_URL="HTTP://127.0.0.1:7545"
+web3=Web3(Web3.HTTPProvider(ganache_URL))
+web3.eth.defaultAccount=web3.eth.accounts[0]
+abi=json.loads(abi) # we can change the name of the variable
+address=web3.toChecksumAddress("0x8450f2E3E88A2f334Ec649737e7E6EFFdbFd0d5D")
+contract=web3.eth.contract(address=address,abi=abi)
 
 # USER INTERFACE
 
@@ -38,6 +37,7 @@ tab_parent.pack(expand=1, fill='both')
 
 # make each tab scrollable (PA)
 main_frame_PA = Frame(tab_pa)
+
 main_frame_PA.pack(fill=BOTH, expand = 1)
 
 my_canvas_PA = Canvas(main_frame_PA)
@@ -50,6 +50,7 @@ my_canvas_PA.configure(yscrollcommand=my_scrollbar_PA.set)
 my_canvas_PA.bind('<Configure>', lambda e: my_canvas_PA.configure(scrollregion = my_canvas_PA.bbox("all")))
 
 second_frame_PA = Frame(my_canvas_PA)
+
 
 my_canvas_PA.create_window((0,0),window=second_frame_PA, anchor ="nw")
 
@@ -89,12 +90,11 @@ second_frame_citizen = Frame(my_canvas_citizen)
 
 my_canvas_citizen.create_window((0,0),window=second_frame_citizen, anchor ="nw")
 
-env1 = makeform(second_frame_contractor, ('Primo','Secondo','Terzo'))
-
 # creating link the function to the user interface
 
+elements1 = makeform(second_frame_PA,('tender_name','description','n_days','n_days_2','weight_1_price', 'weight_2_time', 'weight_3_envir'))
+btn=elements1["btn"]
+btn['command'] = lambda arg1=web3, arg2=contract, arg3=elements1: create_tender(arg1,arg2,arg3)
 
-
-
-
+btn["command"]
 window.mainloop()
