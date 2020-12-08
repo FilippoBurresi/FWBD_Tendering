@@ -212,7 +212,7 @@ contract TenderingSmartContract  {
         }
     }
 
-    function assign_winner(uint _tenderKey) onlyAllowed afterDeadline(_tenderKey) returns (address, uint) {
+    function assign_winner(uint _tenderKey) onlyAllowed afterDeadline(_tenderKey) {
         uint winning_score = _scores[_tenderKey][0];
         uint winning_index = 0;
 
@@ -227,11 +227,11 @@ contract TenderingSmartContract  {
         tenders[_tenderKey].winningContractor = _participants[_tenderKey][winning_index];
         tenderIdToWinner[_tenderKey] = _participants[_tenderKey][winning_index];
         emit Winner_display("We have a winner!", _tenderKey, _participants[_tenderKey][winning_index], winning_score);
-        return (_participants[_tenderKey][winning_index], winning_score);
+        //return (_participants[_tenderKey][winning_index], winning_score);
     }
 
-    function displayWinner(uint _tenderKey) afterDeadline(_tenderKey) returns (address) {
-        return tenderIdToWinner[_tenderKey];
+    function displayWinner(uint _tenderKey) afterDeadline(_tenderKey) returns (address, uint) {
+        return (tenderIdToWinner[_tenderKey], tenders[_tenderKey].addressToScore[tenderIdToWinner[_tenderKey]]);
         /*
         Alternatively, we can simply return tenders[_tenderKey].winningContractor
         Check which option consumes less gas. And, if tenders[_tenderKey].winningContractor consumes less,
@@ -274,8 +274,8 @@ contract TenderingSmartContract  {
         return (name_contractor, text_description, sep, score, is_winner);
     }
 
-    function getTendersLength() public view returns(uint) {
-        return tenderKeys;
+    function getTendersLength() public returns(uint) {
+        return (tenderKeys);
     }
     
     function isPending(uint _tenderKey) public returns(uint, bool) {
@@ -292,9 +292,9 @@ contract TenderingSmartContract  {
     
     
     function see_TenderDetails(uint _tenderKey) public returns (uint  tender_id, string memory tenderName,string memory description, 
-                                uint[] memory evaluation_weights, address[] memory bidList){
+                                uint[] memory evaluation_weights, address[] memory bidList, address winningContractor){
                                     
-        return (tenders[_tenderKey].tender_id, tenders[_tenderKey].tenderName, tenders[_tenderKey].description, tenders[_tenderKey].evaluation_weights, tenders[_tenderKey].bidList);
+        return (tenders[_tenderKey].tender_id, tenders[_tenderKey].tenderName, tenders[_tenderKey].description, tenders[_tenderKey].evaluation_weights, tenders[_tenderKey].bidList, tenders[_tenderKey].winningContractor);
 
         /*
         Now, this function returns the list of all the contractors that sent a bid.
@@ -303,4 +303,3 @@ contract TenderingSmartContract  {
     }
 
 }
-
