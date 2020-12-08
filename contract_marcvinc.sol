@@ -79,6 +79,7 @@ contract TenderingSmartContract  {
                             uint w1, uint w2, uint w3) public  isOwner{
         uint sum = w1.add(w2.add(w3));
         require(sum == 100, 'sum must be 100');
+        require(_daysUntilClosingDateData > _daysUntilClosingDateHash);
 
         Tender storage c = tenders[tenderKeys];
         c.tender_id = tenderKeys;
