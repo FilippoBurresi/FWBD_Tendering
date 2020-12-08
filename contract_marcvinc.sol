@@ -35,6 +35,8 @@ contract TenderingSmartContract  {
         mapping(address => uint) addressToScore; // NEW! from bidding address to its score 
         address tenderingInstitution;
         address winningContractor;
+        //checking each bidder = 1 bid per tender
+        mapping(address => bool) AlreadyBid;
     }
 
     mapping (uint => Tender) public tenders;
@@ -104,10 +106,20 @@ contract TenderingSmartContract  {
         );
         _;
     }
+    
+    
+    modifier AlreadyPlacedBid(uint256 _tenderKey) {
+        require(
+            (tenders[_tenderKey].AlreadyBid[msg.sender] != true),
+        "The bidder has already place a bid for this tender"
+        );
+        _;
+    }
 
     // this function allowed contractors to participate the tender by sumbitting the hash
-    function placeBid (uint256 _tenderKey, bytes32 _hashOffer) public inTimeHash(_tenderKey) {
+    function placeBid (uint256 _tenderKey, bytes32 _hashOffer) public inTimeHash(_tenderKey) AlreadyPlacedBid(_tenderKey) {
         Tender storage c = tenders[_tenderKey];
+        c.AlreadyBid[msg.sender] = true;
         c.bids[msg.sender] = BiddingOffer(msg.sender,_hashOffer,"",false,"", new string[](0));
         c.bidList.push(msg.sender);
     }
