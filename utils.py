@@ -14,79 +14,6 @@ abi = """[
 		"constant": false,
 		"inputs": [
 			{
-				"name": "_tenderKey",
-				"type": "uint256"
-			}
-		],
-		"name": "assign_winner",
-		"outputs": [
-			{
-				"name": "",
-				"type": "address"
-			},
-			{
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "_tenderKey",
-				"type": "uint256"
-			}
-		],
-		"name": "compute_scores",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "_tenderKey",
-				"type": "uint256"
-			},
-			{
-				"name": "_description",
-				"type": "string"
-			},
-			{
-				"name": "_separator",
-				"type": "string"
-			}
-		],
-		"name": "concludeBid",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "_addressPA",
-				"type": "address"
-			}
-		],
-		"name": "CreatePA",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
 				"name": "_tenderName",
 				"type": "string"
 			},
@@ -122,41 +49,97 @@ abi = """[
 		"type": "function"
 	},
 	{
-		"constant": false,
+		"constant": true,
 		"inputs": [],
-		"name": "displayPendingTenders",
+		"name": "tenderKeys",
 		"outputs": [
 			{
 				"name": "",
-				"type": "string[]"
-			},
-			{
-				"name": "",
-				"type": "uint256[]"
-			},
-			{
-				"name": "",
-				"type": "uint256[]"
-			},
-			{
-				"name": "",
-				"type": "uint256[]"
-			},
-			{
-				"name": "",
-				"type": "uint256[]"
-			},
-			{
-				"name": "",
-				"type": "uint256[]"
-			},
-			{
-				"name": "",
-				"type": "uint256[]"
+				"type": "uint256"
 			}
 		],
 		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_tenderKey",
+				"type": "uint256"
+			}
+		],
+		"name": "assign_winner",
+		"outputs": [],
+		"payable": false,
 		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "tenders",
+		"outputs": [
+			{
+				"name": "tender_id",
+				"type": "uint256"
+			},
+			{
+				"name": "tenderName",
+				"type": "string"
+			},
+			{
+				"name": "description",
+				"type": "string"
+			},
+			{
+				"name": "bidOpeningDate",
+				"type": "uint256"
+			},
+			{
+				"name": "bidSubmissionClosingDateData",
+				"type": "uint256"
+			},
+			{
+				"name": "bidSubmissionClosingDateHash",
+				"type": "uint256"
+			},
+			{
+				"name": "tenderingInstitution",
+				"type": "address"
+			},
+			{
+				"name": "winningContractor",
+				"type": "address"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "tenderList",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{
@@ -172,8 +155,34 @@ abi = """[
 			{
 				"name": "",
 				"type": "address"
+			},
+			{
+				"name": "",
+				"type": "uint256"
 			}
 		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_tenderKey",
+				"type": "uint256"
+			},
+			{
+				"name": "_description",
+				"type": "string"
+			},
+			{
+				"name": "_separator",
+				"type": "string"
+			}
+		],
+		"name": "concludeBid",
+		"outputs": [],
 		"payable": false,
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -204,6 +213,113 @@ abi = """[
 				"type": "uint256"
 			}
 		],
+		"name": "compute_scores",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "_tenderKey",
+				"type": "uint256"
+			},
+			{
+				"name": "_index",
+				"type": "uint256"
+			}
+		],
+		"name": "getResultsValue",
+		"outputs": [
+			{
+				"name": "",
+				"type": "address"
+			},
+			{
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "_tenderKey",
+				"type": "uint256"
+			},
+			{
+				"name": "_index",
+				"type": "address"
+			}
+		],
+		"name": "getBidDetails",
+		"outputs": [
+			{
+				"name": "",
+				"type": "address"
+			},
+			{
+				"name": "",
+				"type": "string[]"
+			},
+			{
+				"name": "",
+				"type": "string"
+			},
+			{
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_tenderKey",
+				"type": "uint256"
+			}
+		],
+		"name": "isPending",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_tenderKey",
+				"type": "uint256"
+			}
+		],
 		"name": "see_TenderDetails",
 		"outputs": [
 			{
@@ -219,31 +335,63 @@ abi = """[
 				"type": "string"
 			},
 			{
+				"name": "evaluation_weights",
+				"type": "uint256[]"
+			},
+			{
 				"name": "bidList",
 				"type": "address[]"
+			},
+			{
+				"name": "winningContractor",
+				"type": "address"
 			}
 		],
 		"payable": false,
 		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "allowedInstitution",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{
 		"constant": false,
 		"inputs": [
 			{
-				"name": "_phrase",
-				"type": "string"
-			},
-			{
-				"name": "_separator",
-				"type": "string"
+				"name": "_addressPA",
+				"type": "address"
 			}
 		],
-		"name": "SMT",
+		"name": "CreatePA",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [],
+		"name": "getTendersLength",
 		"outputs": [
 			{
 				"name": "",
-				"type": "string[]"
+				"type": "uint256"
 			}
 		],
 		"payable": false,
@@ -251,17 +399,22 @@ abi = """[
 		"type": "function"
 	},
 	{
-		"constant": false,
+		"constant": true,
 		"inputs": [
 			{
 				"name": "_tenderKey",
 				"type": "uint256"
 			}
 		],
-		"name": "SplitDescription",
-		"outputs": [],
+		"name": "getResultsLenght",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
 		"payable": false,
-		"stateMutability": "nonpayable",
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{
@@ -313,205 +466,6 @@ abi = """[
 		],
 		"name": "Winner_display",
 		"type": "event"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"name": "",
-				"type": "address"
-			}
-		],
-		"name": "allowedInstitution",
-		"outputs": [
-			{
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"name": "_tenderKey",
-				"type": "uint256"
-			},
-			{
-				"name": "_index",
-				"type": "address"
-			}
-		],
-		"name": "getBidDetails",
-		"outputs": [
-			{
-				"name": "",
-				"type": "address"
-			},
-			{
-				"name": "",
-				"type": "bytes32"
-			},
-			{
-				"name": "",
-				"type": "bool"
-			},
-			{
-				"name": "",
-				"type": "string[]"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"name": "_tenderKey",
-				"type": "uint256"
-			}
-		],
-		"name": "getResultsLenght",
-		"outputs": [
-			{
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"name": "_tenderKey",
-				"type": "uint256"
-			},
-			{
-				"name": "_index",
-				"type": "uint256"
-			}
-		],
-		"name": "getResultsValue",
-		"outputs": [
-			{
-				"name": "",
-				"type": "address"
-			},
-			{
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"name": "s",
-				"type": "string"
-			}
-		],
-		"name": "stringToUint",
-		"outputs": [
-			{
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [],
-		"name": "tenderKeys",
-		"outputs": [
-			{
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"name": "tenderList",
-		"outputs": [
-			{
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"name": "tenders",
-		"outputs": [
-			{
-				"name": "tender_id",
-				"type": "uint256"
-			},
-			{
-				"name": "tenderName",
-				"type": "string"
-			},
-			{
-				"name": "description",
-				"type": "string"
-			},
-			{
-				"name": "bidOpeningDate",
-				"type": "uint256"
-			},
-			{
-				"name": "bidSubmissionClosingDateData",
-				"type": "uint256"
-			},
-			{
-				"name": "bidSubmissionClosingDateHash",
-				"type": "uint256"
-			},
-			{
-				"name": "tenderingInstitution",
-				"type": "address"
-			},
-			{
-				"name": "winningContractor",
-				"type": "address"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
 	}
 ]"""
 
@@ -569,29 +523,20 @@ def assign_winner(web3,contract,input_dict):
 
 ##### CITIZEN INTERFACE
 def get_tenders_status(web3,contract, input_dict):
-	num_tenders=contract.functions.getTendersLenght().call()
+	num_tenders=contract.functions.getTendersLength().call()
 	l=[]
 	for i in range(num_tenders):
 		key,status=contract.functions.isPending(i).call()
-		list=see_TenderDetails(i).call()
+		list=contract.functions.see_TenderDetails(i).call()
 		list.append(status)
 		l.append(list)	
-	df=pd.Dataframe(l,columns=["tender_id","name","description","weights","bid_list","pending?"])
+	df=pd.DataFrame(l,columns=["tender_id","name","description","weights","bid_list","winning contractor","pending?"])
 	
-	# #from here the code "print" the dataframe
-	# input_dict['tv1']["column"] = list(df.columns)
-	# input_dict['tv1']["show"] = "headings"
-	# for column in input_dict['tv1']["columns"]:
-	# 	input_dict['tv1'].heading(column, text=column) # let the column heading = column name
-
-	# df_rows = df.to_numpy().tolist() # turns the dataframe into a list of lists
-	# for row in df_rows:
-	# 	input_dict['tv1'].insert("", "end", values=row)
 	
 	return df
   
 def see_active_tenders(web3,contract, input_dict):
-	df=get_tenders_status(web3,contract)
+	df=get_tenders_status(web3,contract,input_dict)
 	df = df[df["pending?"]==True]
 	#from here the code "print" the dataframe
 	input_dict['tv1']["column"] = list(df.columns)
@@ -605,7 +550,7 @@ def see_active_tenders(web3,contract, input_dict):
 
     
 def see_closed_tenders(web3,contract, input_dict):
-	df=get_tenders_status(web3,contract)
+	df=get_tenders_status(web3,contract,input_dict)
 	df = df[df["pending?"]==False]
 	#from here the code "print" the dataframe
 	input_dict['tv1']["column"] = list(df.columns)
@@ -712,8 +657,7 @@ def load_txt():
 def send_unencrypted_solidity(web3,contract,tender_id,user_id,unencrypted_message,separator):
     
     web3.eth.defaultAccount=web3.eth.accounts[int(user_id)]
-    bid_id = contract.functions.returningBidIdAddress(tender_id).call()
-    contract.functions.concludeBid(tender_id,unencrypted_message,separator).transact()
+    contract.functions.concludeBid(int(tender_id),unencrypted_message,separator).transact()
     
 
 

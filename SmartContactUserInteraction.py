@@ -14,7 +14,7 @@ ganache_URL="HTTP://127.0.0.1:7545"
 web3=Web3(Web3.HTTPProvider(ganache_URL))
 web3.eth.defaultAccount=web3.eth.accounts[0]
 abi=json.loads(abi) # we can change the name of the variable
-address=web3.toChecksumAddress("0x2b9bD2953d70743A6F3b8e3f3Ecaa28eacAc50E5")
+address=web3.toChecksumAddress("0xa8572D3e0e49a181c7419aC54D9A1adE809cD8d1")
 contract=web3.eth.contract(address=address,abi=abi)
 
 # USER INTERFACE
