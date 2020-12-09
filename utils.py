@@ -474,7 +474,10 @@ function_info = {'CreateTender': "questa è la descrizione di create tender",
 			   'concludeBid': 'questa è la descrizione per conclude bid',
 			   'getTenderStatus': 'questa è la descrizione per get tender status vediamo come viene',
 			   'seeActiveTenders': 'questa è la descrizione per see active tenders vediamo come viene se la faccio più lunga',
-			   'seeClosedTenders': 'questa è la descrizione per see closed tenders vediamo come viene'}
+			   'seeClosedTenders': 'questa è la descrizione per see closed tenders vediamo come viene',
+			   'allowCompanies': 'descrizione fakfjaòfdsa',
+			   "getBidsDetails": 'description dfjaskldfnaòsdfnadfjal',
+			   'assignWinner': 'fasdfalksdnaskdnfaksnf',}
 # Web3 function
 
 #### PA INTERFACE
@@ -498,16 +501,16 @@ def create_tender(web3,contract,input_dict_pa):
 def create_tender_solidity(web3,contract,tender_name,description,n_days_1,n_days_2,weight_1_price,weight_2_time,weight_3_envir):
     web3.eth.defaultAccount=web3.eth.accounts[0]
     contract.functions.CreateTender(tender_name,description,n_days_1,n_days_2,weight_1_price,weight_2_time,weight_3_envir).transact()
-    
+ 
     
     
     
 
 def allowed_companies_ids(web3,contract,input_dict):
-    list_allowed=input_dict["allowed_companies"].get().split(",")
-    for i in list_allowed:
-        contract.functions.CreatePA(web3.eth.accounts[int(i)]).transact()
-        
+	list_allowed=input_dict["allowed_companies"].get().split(",")
+	for i in list_allowed:
+		contract.functions.CreatePA(web3.eth.accounts[int(i)]).transact()
+		
 
 def assign_winner(web3,contract,input_dict):
     tender_id=int(input_dict["tender_id"].get())
@@ -562,8 +565,9 @@ def see_closed_tenders(web3,contract, input_dict):
 	for row in df_rows:
 		input_dict['tv1'].insert("", "end", values=row)
 
-    
+
 def get_bids_details(web3,contract,input_dict):
+
 	#### io clicco sul df delle closed tenders su una riga 
 	#e vado su questa nuova view: fattibile?come prendo input?
 	tender_id = int(input_dict['tender_id'].get())
@@ -573,16 +577,15 @@ def get_bids_details(web3,contract,input_dict):
 		bids_list.append(contract.functions.getBidDetails(tender_id,address).call())
 	df = pd.DataFrame(bids_list,columns=["name","description","separator","score","winner?"])
 
-	# input_dict['tv1']["column"] = list(df.columns)
-	# input_dict['tv1']["show"] = "headings"
-	# for column in input_dict['tv1']["columns"]:
-	# 	input_dict['tv1'].heading(column, text=column) # let the column heading = column name
+	input_dict['tv1']["column"] = list(df.columns)
+	input_dict['tv1']["show"] = "headings"
+	for column in input_dict['tv1']["columns"]:
+		input_dict['tv1'].heading(column, text=column) # let the column heading = column name
 
-	# df_rows = df.to_numpy().tolist() # turns the dataframe into a list of lists
-	# for row in df_rows:
-	# 	input_dict['tv1'].insert("", "end", values=row)
+	df_rows = df.to_numpy().tolist() # turns the dataframe into a list of lists
+	for row in df_rows:
+		input_dict['tv1'].insert("", "end", values=row)
 
-	return df
 
     
 
@@ -687,7 +690,7 @@ def makeform(root, fields, title="Lorem Ipsum", description="Lorem Ipsum descrip
 		ent.pack(side = RIGHT, expand = YES, fill = X)
 		entries[field] = ent
 	if view:
-		row = LabelFrame(root, text="Excel Data", height=250, width=600)
+		row = LabelFrame(root, text="Data", height=250, width=600)
 		sub_row1 = Frame(row)
 		sub_row2 = Frame(row)
 		tv1 = ttk.Treeview(sub_row1)   
