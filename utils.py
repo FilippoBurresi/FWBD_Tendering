@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import messagebox
 from tkinter import ttk
 import pandas as pd
 from tkinter import filedialog
@@ -485,18 +486,21 @@ function_info = {'CreateTender': "questa è la descrizione di create tender",
 
 
 def create_tender(web3,contract,input_dict_pa):
-    ## non capisco tender_keys // tender_id, come funzionano ?? ho messo come input anche ID TENDER
-    ###input_dict_pa={"tender_name":"ponte di messina","description":"blablabla","n_days1":"1";"n_days2":"2","weight_price":"0.3"
-    #,"weight_time":"0.1","weight_environment":0.6}
-    tender_name=input_dict_pa["tender_name"].get()
-    description=input_dict_pa["description"].get()
-    n_days_1=int(input_dict_pa["n_days"].get())
-    n_days_2=int(input_dict_pa["n_days_2"].get())
-    n_days_2=int(input_dict_pa["n_days_2"].get())
-    weight_1_price=int(input_dict_pa["weight_1_price"].get())
-    weight_2_time=int(input_dict_pa["weight_2_time"].get())
-    weight_3_envir=int(input_dict_pa["weight_3_envir"].get())
-    create_tender_solidity(web3,contract,tender_name,description,n_days_1,n_days_2,weight_1_price,weight_2_time,weight_3_envir)
+	## non capisco tender_keys // tender_id, come funzionano ?? ho messo come input anche ID TENDER
+	###input_dict_pa={"tender_name":"ponte di messina","description":"blablabla","n_days1":"1";"n_days2":"2","weight_price":"0.3"
+	#,"weight_time":"0.1","weight_environment":0.6}
+	tender_name=input_dict_pa["tender_name"].get()
+	description=input_dict_pa["description"].get()
+	n_days_1=int(input_dict_pa["n_days"].get())
+	n_days_2=int(input_dict_pa["n_days_2"].get())
+	n_days_2=int(input_dict_pa["n_days_2"].get())
+	weight_1_price=int(input_dict_pa["weight_1_price"].get())
+	weight_2_time=int(input_dict_pa["weight_2_time"].get())
+	weight_3_envir=int(input_dict_pa["weight_3_envir"].get())
+	create_tender_solidity(web3,contract,tender_name,description,n_days_1,n_days_2,weight_1_price,weight_2_time,weight_3_envir)
+	messagebox.showinfo("Create Tender", "the function has been called successfully")
+	
+
     
 def create_tender_solidity(web3,contract,tender_name,description,n_days_1,n_days_2,weight_1_price,weight_2_time,weight_3_envir):
     web3.eth.defaultAccount=web3.eth.accounts[0]
@@ -510,6 +514,7 @@ def allowed_companies_ids(web3,contract,input_dict):
 	list_allowed=input_dict["allowed_companies"].get().split(",")
 	for i in list_allowed:
 		contract.functions.CreatePA(web3.eth.accounts[int(i)]).transact()
+	messagebox.showinfo("Allowed Companies", "The companies have been added to the allowed list")
 		
 
 def assign_winner(web3,contract,input_dict):
@@ -519,6 +524,7 @@ def assign_winner(web3,contract,input_dict):
     contract.functions.assign_winner(tender_id).transact()
     winning_address,score=contract.functions.displayWinner(tender_id).call()
     return web3.eth.accounts.index(winning_address)
+	messagebox.showinfo("Assign Winner", "The winner of the tender has been appointed")
 
 
 
@@ -607,12 +613,14 @@ def send_bid(web3,contract, input_dict):
     
     send_bid_solidity(web3,contract,user_id,tender_id,hash)
     save_txt(str(user_id),str(separator),unencrypted_message,str(tender_id))
+	messagebox.showinfo("Send bid", "The bid has been sent successfully")
     
 def send_unencrypted(web3,contract, input_dict):
 	user_id = int(input_dict['user_id'].get())
 	##come funziona qua per l'input con il txt?
 	tender_id,unencrypted_message,separator=load_txt()
 	send_unencrypted_solidity(web3,contract,tender_id,user_id,unencrypted_message,separator)
+	messagebox.showinfo("Bid Completed", "The unencripted bid has been sent")
 
 
 
