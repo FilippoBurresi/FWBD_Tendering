@@ -16,16 +16,14 @@ contract TenderingSmartContract  {
     struct BiddingOffer {
         address contractor;
         bytes32 hashOffer;
-        string description;
         bool valid;
+        string description;
         string separator;
         string[] NewDescription;
     }
 
     struct Tender {
         uint256 tender_id;
-        string tenderName;
-        string description;
         uint256 bidOpeningDate;
         uint256 bidSubmissionClosingDateData;
         uint256 bidSubmissionClosingDateHash;
@@ -33,16 +31,19 @@ contract TenderingSmartContract  {
         address[] bidList; // array where to store all the addresses that are bidding
         mapping(address => BiddingOffer) bids; // from bidding address to its bidding offer
         mapping(address => uint) addressToScore; // NEW! from bidding address to its score 
-        address tenderingInstitution;
-        address winningContractor;
         //checking each bidder = 1 bid per tender
         mapping(address => bool) AlreadyBid;
+        address tenderingInstitution;
+        address winningContractor;
+        string tenderName;
+        string description;
     }
 
-    mapping (uint => Tender) public tenders;
+    
     uint[] public tenderList; //list of tender keys so we can enumarate them
-    uint public tenderKeys = 0;
-
+    uint public tenderKeys;
+    mapping (uint => Tender) public tenders;
+    
     // needed for the evaluation part
     mapping(uint => address[]) private _participants; //from tenderKey => list of participants
     mapping(uint => uint[])  private _scores; //from tenderKey => list of scores
@@ -58,8 +59,9 @@ contract TenderingSmartContract  {
     allowedInstitution[msg.sender] = true;
      }
 
-    event message(string message, address sender);
-    event Winner_display(string, uint, address, uint); //title, tender_key, winner address, its score
+    
+    //event message(string message, address sender);
+    //event Winner_display(string, uint, address, uint); //title, tender_key, winner address, its score
 
     modifier isOwner{
         require(msg.sender == owner);
@@ -94,7 +96,7 @@ contract TenderingSmartContract  {
         c.evaluation_weights.push(w3);
         c.bidList= new address[](0);
 
-        emit message("Tender Deployed", msg.sender);
+        //emit message("Tender Deployed", msg.sender);
 
         tenderKeys ++;
 
@@ -103,7 +105,7 @@ contract TenderingSmartContract  {
     modifier inTimeHash (uint256 _tenderKey) {
         require(
         (now >= tenders[_tenderKey].bidOpeningDate) && (now <= tenders[_tenderKey].bidSubmissionClosingDateHash),
-        "The hashed bid has to be placed after the bid opening date and before the hash closing date."
+        "hash sent before the opening date or after the hash closing date!"
         );
         _;
     }
@@ -112,7 +114,7 @@ contract TenderingSmartContract  {
     modifier AlreadyPlacedBid(uint256 _tenderKey) {
         require(
             (tenders[_tenderKey].AlreadyBid[msg.sender] != true),
-        "The bidder has already place a bid for this tender"
+        "Bid already placed for this tender!"
         );
         _;
     }
@@ -121,14 +123,14 @@ contract TenderingSmartContract  {
     function placeBid (uint256 _tenderKey, bytes32 _hashOffer) public inTimeHash(_tenderKey) AlreadyPlacedBid(_tenderKey) {
         Tender storage c = tenders[_tenderKey];
         c.AlreadyBid[msg.sender] = true;
-        c.bids[msg.sender] = BiddingOffer(msg.sender,_hashOffer,"",false,"", new string[](0));
+        c.bids[msg.sender] = BiddingOffer(msg.sender,_hashOffer,false,"","", new string[](0));
         c.bidList.push(msg.sender);
     }
 
     modifier inTimeData (uint256 _tenderKey) {
         require(
         (now >= tenders[_tenderKey].bidSubmissionClosingDateHash) && (now < tenders[_tenderKey].bidSubmissionClosingDateData),
-        "The data has to be sent after the hash closing date and before the data closing date."
+        "data sent before the hash closing date or after the data closing date."
         );
         _;
     }
@@ -137,9 +139,9 @@ contract TenderingSmartContract  {
     function concludeBid(uint256 _tenderKey, string memory _description, string memory _separator) public inTimeData(_tenderKey) {
 
         //assert that the it is the bids of the contractor that it is trying to conclude the Bid
-        assert(tenders[_tenderKey].bids[msg.sender].contractor == msg.sender);
+        require(tenders[_tenderKey].bids[msg.sender].contractor == msg.sender);
         // check that the hash correspond
-        assert (keccak256(abi.encodePacked(_description)) == tenders[_tenderKey].bids[msg.sender].hashOffer);
+        require(keccak256(abi.encodePacked(_description)) == tenders[_tenderKey].bids[msg.sender].hashOffer);
         // finally conclude the bid by submitting the description
         tenders[_tenderKey].bids[msg.sender].description = _description;
         //memorizing the separator used in each bid
@@ -170,13 +172,13 @@ contract TenderingSmartContract  {
     }
 
     modifier afterDeadline (uint256 _tenderKey) {
-        assert(tenders[_tenderKey].bidSubmissionClosingDateData < now);
+        require(tenders[_tenderKey].bidSubmissionClosingDateData < now);
         _;
     }
     
     function stringToUint(string s) private returns (uint) {
         bytes memory b = bytes(s);
-        uint result = 0;
+        uint result;
         for (uint i = 0; i < b.length; i++) {
             if (b[i] >= 48 && b[i] <= 57) {
                 result = result * 10 + (uint(b[i]) - 48);
@@ -227,7 +229,7 @@ contract TenderingSmartContract  {
         }
         tenders[_tenderKey].winningContractor = _participants[_tenderKey][winning_index];
         tenderIdToWinner[_tenderKey] = _participants[_tenderKey][winning_index];
-        emit Winner_display("We have a winner!", _tenderKey, _participants[_tenderKey][winning_index], winning_score);
+        //emit Winner_display("We have a winner!", _tenderKey, _participants[_tenderKey][winning_index], winning_score);
         //return (_participants[_tenderKey][winning_index], winning_score);
     }
 
