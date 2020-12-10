@@ -186,6 +186,18 @@ contract TenderingSmartContract  {
         }
         return result;
     }
+    
+    
+    function adjust_measures(uint _thingToLook, uint _thingToAdjust) private returns(uint) {
+        
+        uint n_times = 0;
+        uint _thingNew = _thingToLook;
+        while (_thingNew / (10) != 0) {
+            _thingNew = _thingNew / 10;
+            n_times ++; 
+        }
+        return ( _thingToAdjust.mul(10 ** n_times));
+    }
 
     function compute_scores(uint _tenderKey) onlyAllowed afterDeadline(_tenderKey) {
         uint w1 = tenders[_tenderKey].evaluation_weights[0]; // weight associated to price
@@ -202,11 +214,14 @@ contract TenderingSmartContract  {
                 uint price = stringToUint(to_store.NewDescription[0]);
                 uint timing = stringToUint(to_store.NewDescription[1]);
                 uint environment = stringToUint(to_store.NewDescription[2]);
+                
+                //to make timing and envir comparable with price
+                uint timing_adjusted = adjust_measures(price, timing);
+                uint environment_adjusted = adjust_measures(price, environment); // e.g. if price=10000 and env=2 then envir_adj = 20000
 
                 uint score = w1.mul(price);
-                score = score.add(w2.mul(timing));
-                score = score.add(w3.mul(environment));
-
+                score = score.add(w2.mul(timing_adjusted));
+                score = score.add(w3.mul(environment_adjusted));
 
                _participants[_tenderKey].push(to_store.contractor);
                _scores[_tenderKey].push(score);
