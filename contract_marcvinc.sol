@@ -191,7 +191,7 @@ contract TenderingSmartContract  {
     
     function adjust_measures(uint _thingToLook, uint _thingToAdjust) private returns(uint) {
         
-        uint n_times = 0;
+        uint n_times;
         uint _thingNew = _thingToLook;
         while (_thingNew / (10) != 0) {
             _thingNew = _thingNew / 10;
@@ -230,7 +230,7 @@ contract TenderingSmartContract  {
 
     function assign_winner(uint _tenderKey) onlyAllowed afterDeadline(_tenderKey) {
         uint winning_score = _scores[_tenderKey][0];
-        uint winning_index = 0;
+        uint winning_index;
 
         for (uint i = 1; i < _participants[_tenderKey].length; i++){
             uint score = _scores[_tenderKey][i];
