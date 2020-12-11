@@ -28,7 +28,7 @@ contract TenderingSmartContract  {
         uint256 bidSubmissionClosingDateData;
         uint256 bidSubmissionClosingDateHash;
         uint[] evaluation_weights; // array of lenght=3 that stores the weights used for evaluation, i.e. weighted average
-        address[] bidList; // array where to store all the addresses that are bidding
+        //address[] bidList; // array where to store all the addresses that are bidding
         mapping(address => BiddingOffer) bids; // from bidding address to its bidding offer
         mapping(address => uint) addressToScore; // NEW! from bidding address to its score 
         //checking each bidder = 1 bid per tender
@@ -94,7 +94,7 @@ contract TenderingSmartContract  {
         c.evaluation_weights.push(w1);
         c.evaluation_weights.push(w2);
         c.evaluation_weights.push(w3);
-        c.bidList= new address[](0);
+        //c.bidList= new address[](0);
 
         //emit message("Tender Deployed", msg.sender);
 
@@ -124,7 +124,8 @@ contract TenderingSmartContract  {
         Tender storage c = tenders[_tenderKey];
         c.AlreadyBid[msg.sender] = true;
         c.bids[msg.sender] = BiddingOffer(msg.sender,_hashOffer,false,"","", new string[](0));
-        c.bidList.push(msg.sender);
+        //c.bidList.push(msg.sender);
+        _participants[_tenderKey].push(msg.sender); 
     }
 
     modifier inTimeData (uint256 _tenderKey) {
@@ -163,11 +164,11 @@ contract TenderingSmartContract  {
 
     //with this function each bid_id is assigned to a list of the elements presented in the original string-offer
     function splitDescription(uint256 _tenderKey) private onlyAllowed afterDeadline(_tenderKey) {
-        for (uint i=0; i<tenders[_tenderKey].bidList.length; i++){
-             string memory separatorToUse  = tenders[_tenderKey].bids[tenders[_tenderKey].bidList[i]].separator;
+        for (uint i=0; i < _participants[_tenderKey].length; i++){
+             string memory separatorToUse  = tenders[_tenderKey].bids[_participants[_tenderKey][i]].separator;
             //UPDATE DESCRIPTION
-            string memory descriptionAtTheMoment = tenders[_tenderKey].bids[tenders[_tenderKey].bidList[i]].description;
-            tenders[_tenderKey].bids[tenders[_tenderKey].bidList[i]].NewDescription = SMT(descriptionAtTheMoment,separatorToUse);
+            string memory descriptionAtTheMoment = tenders[_tenderKey].bids[_participants[_tenderKey][i]].description;
+            tenders[_tenderKey].bids[_participants[_tenderKey][i]].NewDescription = SMT(descriptionAtTheMoment,separatorToUse);
         }
     }
 
@@ -206,8 +207,8 @@ contract TenderingSmartContract  {
 
         splitDescription(_tenderKey);
 
-        for (uint i = 0; i < tenders[_tenderKey].bidList.length; i++){
-            address  target_address= tenders[_tenderKey].bidList[i];
+        for (uint i = 0; i < _participants[_tenderKey].length; i++){
+            address  target_address = _participants[_tenderKey][i];
             BiddingOffer  memory to_store= tenders[_tenderKey].bids[target_address];
             if (to_store.valid == true){
             
@@ -220,7 +221,7 @@ contract TenderingSmartContract  {
                 score = score.add(w2.mul(timing));
                 score = score.add(w3.mul(environment));
 
-               _participants[_tenderKey].push(to_store.contractor);
+               //_participants[_tenderKey].push(to_store.contractor);
                _scores[_tenderKey].push(score);
                tenders[_tenderKey].addressToScore[to_store.contractor] = score;
             }
@@ -307,9 +308,9 @@ contract TenderingSmartContract  {
     
     
     function see_TenderDetails(uint _tenderKey) public returns (uint  tender_id, string memory tenderName,string memory description, 
-                                uint[] memory evaluation_weights, address[] memory bidList, address winningContractor){
+                                uint[] memory evaluation_weights, address[] memory firms, address winningContractor){
                                     
-        return (tenders[_tenderKey].tender_id, tenders[_tenderKey].tenderName, tenders[_tenderKey].description, tenders[_tenderKey].evaluation_weights, tenders[_tenderKey].bidList, tenders[_tenderKey].winningContractor);
+        return (tenders[_tenderKey].tender_id, tenders[_tenderKey].tenderName, tenders[_tenderKey].description, tenders[_tenderKey].evaluation_weights, _participants[_tenderKey], tenders[_tenderKey].winningContractor);
 
         /*
         Now, this function returns the list of all the contractors that sent a bid.
@@ -318,3 +319,4 @@ contract TenderingSmartContract  {
     }
 
 }
+
