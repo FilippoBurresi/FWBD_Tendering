@@ -15,7 +15,7 @@ web3=Web3(Web3.HTTPProvider(ganache_URL))
 web3.eth.defaultAccount=web3.eth.accounts[0]
 account_list = web3.eth.accounts
 abi=json.loads(abi) # we can change the name of the variable
-address=web3.toChecksumAddress("0xedbB6072f3Ef3A345156B57127542b8F22e52fE5")
+address=web3.toChecksumAddress("0x3D44185CB4ED9B211f6774fFf4bcE51dc758fEd8")
 contract=web3.eth.contract(address=address,abi=abi)
 
 # USER INTERFACE
@@ -36,13 +36,13 @@ tab_citizen = ttk.Frame(tab_parent)
 tab_parent.add(tab_login, text="Login")
 tab_parent.add(tab_pa, text="Public Administration")
 tab_parent.add(tab_contractor, text="Contractor")
-tab_parent.add(tab_citizen, text="Citizen")
+tab_parent.add(tab_citizen, text="Notice Board")
 tab_parent.pack(expand=1, fill='both')
 
 # login interface
 def set_account():
-    current_account = account_tkvariable.get().split()[1]
-    print(current_account)
+    web3.eth.defaultAccount = account_tkvariable.get().split()[1]
+    print(web3.eth.defaultAccount)
 account_id_list = [str(i) for i in range(10)]
 account_name_list = ['Public Administration', '1','2','3','4','5','6','7','8','Citizen']
 selection_list = [' '.join(i) for i in zip(account_id_list, account_list, account_name_list)]
@@ -120,14 +120,14 @@ btn_1['command'] = lambda arg1=web3, arg2=contract, arg3=elem_1: create_tender(a
 
 #placeBid
 title = 'placeBid'
-place_bid_fields = ('user_id','tender_id','price','time','envir')
+place_bid_fields = ('tender_id','price','time','envir')
 elem_2 = makeform(second_frame_contractor, place_bid_fields,title=title, description=function_info[title])
 btn_2 = elem_2['btn']
 btn_2['command'] = lambda arg1=web3, arg2=contract, arg3=elem_2: send_bid(arg1,arg2,arg3)
 
 #concludeBid
 title = 'concludeBid'
-conclude_bid_fields = ('user_id',)
+conclude_bid_fields = ()
 elem_3 = makeform(second_frame_contractor, conclude_bid_fields, title=title, description=function_info[title],file= True)
 btn_3 = elem_3['btn']
 btn_3['command'] = lambda arg1=web3, arg2= contract, arg3 = elem_3: send_unencrypted(arg1, arg2, arg3)
@@ -162,7 +162,7 @@ btn_7['command'] = lambda arg1=web3, arg2=contract, arg3=elem_7: allowed_compani
 #PA see offer given tender id
 title = "getBidsDetails"
 get_bids_details_fields = ('tender_id',)
-elem_8 = makeform(second_frame_PA, get_bids_details_fields, title=title, description=function_info[title], view=True)
+elem_8 = makeform(second_frame_citizen, get_bids_details_fields, title=title, description=function_info[title], view=True)
 btn_8 = elem_8['btn']
 btn_8['command'] = lambda arg1=web3, arg2=contract, arg3=elem_8: get_bids_details(arg1, arg2, arg3)
 
@@ -171,6 +171,6 @@ title = 'assignWinner'
 assing_winner_fields = ('tender_id',)
 elem_9 = makeform(second_frame_PA, assing_winner_fields, title=title, description=function_info[title])
 btn_9 = elem_9['btn']
-btn_8['command'] = lambda arg1=web3, arg2=contract, arg3=elem_9: assign_winner(arg1, arg2, arg3)
+btn_9['command'] = lambda arg1=web3, arg2=contract, arg3=elem_9: assign_winner(arg1, arg2, arg3)
 
 window.mainloop()

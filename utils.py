@@ -12,141 +12,127 @@ import random
 filename = "/"
 abi = """[
 	{
-		"constant": false,
 		"inputs": [
 			{
-				"name": "_tenderName",
-				"type": "string"
-			},
-			{
-				"name": "_description",
-				"type": "string"
-			},
-			{
-				"name": "_daysUntilClosingDateData",
-				"type": "uint256"
-			},
-			{
-				"name": "_daysUntilClosingDateHash",
-				"type": "uint256"
-			},
-			{
-				"name": "w1",
-				"type": "uint256"
-			},
-			{
-				"name": "w2",
-				"type": "uint256"
-			},
-			{
-				"name": "w3",
-				"type": "uint256"
+				"internalType": "address",
+				"name": "id",
+				"type": "address"
 			}
 		],
-		"name": "CreateTender",
+		"name": "addFirm",
 		"outputs": [],
-		"payable": false,
 		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
-		"constant": true,
-		"inputs": [],
-		"name": "tenderKeys",
-		"outputs": [
+		"inputs": [
 			{
-				"name": "",
-				"type": "uint256"
+				"internalType": "address",
+				"name": "id",
+				"type": "address"
 			}
 		],
-		"payable": false,
-		"stateMutability": "view",
+		"name": "addPA",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
-		"constant": false,
 		"inputs": [
 			{
+				"internalType": "uint256",
 				"name": "_tenderKey",
 				"type": "uint256"
 			}
 		],
 		"name": "assign_winner",
 		"outputs": [],
-		"payable": false,
 		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
-		"constant": true,
 		"inputs": [
 			{
-				"name": "",
+				"internalType": "uint256",
+				"name": "_tenderKey",
 				"type": "uint256"
 			}
 		],
-		"name": "tenders",
-		"outputs": [
-			{
-				"name": "tender_id",
-				"type": "uint256"
-			},
-			{
-				"name": "tenderName",
-				"type": "string"
-			},
-			{
-				"name": "description",
-				"type": "string"
-			},
-			{
-				"name": "bidOpeningDate",
-				"type": "uint256"
-			},
-			{
-				"name": "bidSubmissionClosingDateData",
-				"type": "uint256"
-			},
-			{
-				"name": "bidSubmissionClosingDateHash",
-				"type": "uint256"
-			},
-			{
-				"name": "tenderingInstitution",
-				"type": "address"
-			},
-			{
-				"name": "winningContractor",
-				"type": "address"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
+		"name": "compute_scores",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
-		"constant": true,
 		"inputs": [
 			{
-				"name": "",
+				"internalType": "uint256",
+				"name": "_tenderKey",
 				"type": "uint256"
-			}
-		],
-		"name": "tenderList",
-		"outputs": [
+			},
 			{
-				"name": "",
-				"type": "uint256"
+				"internalType": "string",
+				"name": "_description",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_separator",
+				"type": "string"
 			}
 		],
-		"payable": false,
-		"stateMutability": "view",
+		"name": "concludeBid",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
-		"constant": false,
 		"inputs": [
 			{
+				"internalType": "string",
+				"name": "_tenderName",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_description",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_daysUntilClosingDateData",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_daysUntilClosingDateHash",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "w1",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "w2",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "w3",
+				"type": "uint256"
+			}
+		],
+		"name": "CreateTender",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
 				"name": "_tenderKey",
 				"type": "uint256"
 			}
@@ -154,146 +140,54 @@ abi = """[
 		"name": "displayWinner",
 		"outputs": [
 			{
+				"internalType": "address",
 				"name": "",
 				"type": "address"
 			},
 			{
+				"internalType": "uint256",
 				"name": "",
 				"type": "uint256"
 			}
 		],
-		"payable": false,
 		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
-		"constant": false,
-		"inputs": [
+		"inputs": [],
+		"name": "getTendersLength",
+		"outputs": [
 			{
-				"name": "_tenderKey",
+				"internalType": "uint256",
+				"name": "",
 				"type": "uint256"
-			},
-			{
-				"name": "_description",
-				"type": "string"
-			},
-			{
-				"name": "_separator",
-				"type": "string"
 			}
 		],
-		"name": "concludeBid",
-		"outputs": [],
-		"payable": false,
 		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
-		"constant": false,
 		"inputs": [
 			{
-				"name": "_tenderKey",
-				"type": "uint256"
-			},
-			{
-				"name": "_hashOffer",
+				"internalType": "bytes32",
+				"name": "role",
 				"type": "bytes32"
+			},
+			{
+				"internalType": "address",
+				"name": "account",
+				"type": "address"
 			}
 		],
-		"name": "placeBid",
+		"name": "grantRole",
 		"outputs": [],
-		"payable": false,
 		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
-		"constant": false,
 		"inputs": [
 			{
-				"name": "_tenderKey",
-				"type": "uint256"
-			}
-		],
-		"name": "compute_scores",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"name": "_tenderKey",
-				"type": "uint256"
-			},
-			{
-				"name": "_index",
-				"type": "uint256"
-			}
-		],
-		"name": "getResultsValue",
-		"outputs": [
-			{
-				"name": "",
-				"type": "address"
-			},
-			{
-				"name": "",
-				"type": "uint256"
-			},
-			{
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"name": "_tenderKey",
-				"type": "uint256"
-			},
-			{
-				"name": "_index",
-				"type": "address"
-			}
-		],
-		"name": "getBidDetails",
-		"outputs": [
-			{
-				"name": "",
-				"type": "address"
-			},
-			{
-				"name": "",
-				"type": "string[]"
-			},
-			{
-				"name": "",
-				"type": "string"
-			},
-			{
-				"name": "",
-				"type": "uint256"
-			},
-			{
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
+				"internalType": "uint256",
 				"name": "_tenderKey",
 				"type": "uint256"
 			}
@@ -301,22 +195,223 @@ abi = """[
 		"name": "isPending",
 		"outputs": [
 			{
+				"internalType": "uint256",
 				"name": "",
 				"type": "uint256"
 			},
 			{
+				"internalType": "bool",
 				"name": "",
 				"type": "bool"
 			}
 		],
-		"payable": false,
 		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
-		"constant": false,
 		"inputs": [
 			{
+				"internalType": "string",
+				"name": "_value",
+				"type": "string"
+			}
+		],
+		"name": "parseInt",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "_ret",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_tenderKey",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bytes32",
+				"name": "_hashOffer",
+				"type": "bytes32"
+			}
+		],
+		"name": "placeBid",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "id",
+				"type": "address"
+			}
+		],
+		"name": "renounceFIRM",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "id",
+				"type": "address"
+			}
+		],
+		"name": "renouncePA",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bytes32",
+				"name": "role",
+				"type": "bytes32"
+			},
+			{
+				"internalType": "address",
+				"name": "account",
+				"type": "address"
+			}
+		],
+		"name": "renounceRole",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "id",
+				"type": "address"
+			}
+		],
+		"name": "revokeFirm",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "id",
+				"type": "address"
+			}
+		],
+		"name": "revokePA",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bytes32",
+				"name": "role",
+				"type": "bytes32"
+			},
+			{
+				"internalType": "address",
+				"name": "account",
+				"type": "address"
+			}
+		],
+		"name": "revokeRole",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "bytes32",
+				"name": "role",
+				"type": "bytes32"
+			},
+			{
+				"indexed": true,
+				"internalType": "bytes32",
+				"name": "previousAdminRole",
+				"type": "bytes32"
+			},
+			{
+				"indexed": true,
+				"internalType": "bytes32",
+				"name": "newAdminRole",
+				"type": "bytes32"
+			}
+		],
+		"name": "RoleAdminChanged",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "bytes32",
+				"name": "role",
+				"type": "bytes32"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "account",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "sender",
+				"type": "address"
+			}
+		],
+		"name": "RoleGranted",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "bytes32",
+				"name": "role",
+				"type": "bytes32"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "account",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "sender",
+				"type": "address"
+			}
+		],
+		"name": "RoleRevoked",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
 				"name": "_tenderKey",
 				"type": "uint256"
 			}
@@ -324,38 +419,43 @@ abi = """[
 		"name": "see_TenderDetails",
 		"outputs": [
 			{
+				"internalType": "uint256",
 				"name": "tender_id",
 				"type": "uint256"
 			},
 			{
+				"internalType": "string",
 				"name": "tenderName",
 				"type": "string"
 			},
 			{
+				"internalType": "string",
 				"name": "description",
 				"type": "string"
 			},
 			{
+				"internalType": "uint256[]",
 				"name": "evaluation_weights",
 				"type": "uint256[]"
 			},
 			{
-				"name": "bidList",
+				"internalType": "address[]",
+				"name": "firms",
 				"type": "address[]"
 			},
 			{
+				"internalType": "address",
 				"name": "winningContractor",
 				"type": "address"
 			}
 		],
-		"payable": false,
 		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
-		"constant": true,
 		"inputs": [
 			{
+				"internalType": "address",
 				"name": "",
 				"type": "address"
 			}
@@ -363,46 +463,88 @@ abi = """[
 		"name": "allowedInstitution",
 		"outputs": [
 			{
+				"internalType": "bool",
 				"name": "",
 				"type": "bool"
 			}
 		],
-		"payable": false,
 		"stateMutability": "view",
 		"type": "function"
 	},
 	{
-		"constant": false,
+		"inputs": [],
+		"name": "DEFAULT_ADMIN_ROLE",
+		"outputs": [
+			{
+				"internalType": "bytes32",
+				"name": "",
+				"type": "bytes32"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "FIRM_ROLE",
+		"outputs": [
+			{
+				"internalType": "bytes32",
+				"name": "",
+				"type": "bytes32"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"inputs": [
 			{
-				"name": "_addressPA",
+				"internalType": "uint256",
+				"name": "_tenderKey",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "_index",
 				"type": "address"
 			}
 		],
-		"name": "CreatePA",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [],
-		"name": "getTendersLength",
+		"name": "getBidDetails",
 		"outputs": [
 			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			},
+			{
+				"internalType": "string[]",
+				"name": "",
+				"type": "string[]"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
 				"name": "",
 				"type": "uint256"
+			},
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
 			}
 		],
-		"payable": false,
-		"stateMutability": "nonpayable",
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{
-		"constant": true,
 		"inputs": [
 			{
+				"internalType": "uint256",
 				"name": "_tenderKey",
 				"type": "uint256"
 			}
@@ -410,63 +552,219 @@ abi = """[
 		"name": "getResultsLenght",
 		"outputs": [
 			{
+				"internalType": "uint256",
 				"name": "",
 				"type": "uint256"
 			}
 		],
-		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_tenderKey",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_index",
+				"type": "uint256"
+			}
+		],
+		"name": "getResultsValue",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bytes32",
+				"name": "role",
+				"type": "bytes32"
+			}
+		],
+		"name": "getRoleAdmin",
+		"outputs": [
+			{
+				"internalType": "bytes32",
+				"name": "",
+				"type": "bytes32"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bytes32",
+				"name": "role",
+				"type": "bytes32"
+			},
+			{
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "getRoleMember",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bytes32",
+				"name": "role",
+				"type": "bytes32"
+			}
+		],
+		"name": "getRoleMemberCount",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bytes32",
+				"name": "role",
+				"type": "bytes32"
+			},
+			{
+				"internalType": "address",
+				"name": "account",
+				"type": "address"
+			}
+		],
+		"name": "hasRole",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
 		"stateMutability": "view",
 		"type": "function"
 	},
 	{
 		"inputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "constructor"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
+		"name": "tenderKeys",
+		"outputs": [
 			{
-				"indexed": false,
-				"name": "message",
-				"type": "string"
-			},
-			{
-				"indexed": false,
-				"name": "sender",
-				"type": "address"
-			}
-		],
-		"name": "message",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"name": "",
-				"type": "string"
-			},
-			{
-				"indexed": false,
-				"name": "",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"name": "",
-				"type": "address"
-			},
-			{
-				"indexed": false,
+				"internalType": "uint256",
 				"name": "",
 				"type": "uint256"
 			}
 		],
-		"name": "Winner_display",
-		"type": "event"
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "tenderList",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "tenders",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "tender_id",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "bidOpeningDate",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "bidSubmissionClosingDateData",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "bidSubmissionClosingDateHash",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "tenderingInstitution",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "winningContractor",
+				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "tenderName",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "description",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
 	}
 ]"""
 
@@ -486,24 +784,29 @@ function_info = {'CreateTender': "questa è la descrizione di create tender",
 
 
 def create_tender(web3,contract,input_dict_pa):
-	## non capisco tender_keys // tender_id, come funzionano ?? ho messo come input anche ID TENDER
-	###input_dict_pa={"tender_name":"ponte di messina","description":"blablabla","n_days1":"1";"n_days2":"2","weight_price":"0.3"
-	#,"weight_time":"0.1","weight_environment":0.6}
-	tender_name=input_dict_pa["tender_name"].get()
-	description=input_dict_pa["description"].get()
-	n_days_1=int(input_dict_pa["n_days"].get())
-	n_days_2=int(input_dict_pa["n_days_2"].get())
-	n_days_2=int(input_dict_pa["n_days_2"].get())
-	weight_1_price=int(input_dict_pa["weight_1_price"].get())
-	weight_2_time=int(input_dict_pa["weight_2_time"].get())
-	weight_3_envir=int(input_dict_pa["weight_3_envir"].get())
-	create_tender_solidity(web3,contract,tender_name,description,n_days_1,n_days_2,weight_1_price,weight_2_time,weight_3_envir)
-	messagebox.showinfo("Create Tender", "the function has been called successfully")
+	try:
+
+		## non capisco tender_keys // tender_id, come funzionano ?? ho messo come input anche ID TENDER
+		###input_dict_pa={"tender_name":"ponte di messina","description":"blablabla","n_days1":"1";"n_days2":"2","weight_price":"0.3"
+		#,"weight_time":"0.1","weight_environment":0.6}
+		print(web3.eth.defaultAccount)
+		tender_name=input_dict_pa["tender_name"].get()
+		description=input_dict_pa["description"].get()
+		n_days_1=int(input_dict_pa["n_days"].get())
+		n_days_2=int(input_dict_pa["n_days_2"].get())
+		n_days_2=int(input_dict_pa["n_days_2"].get())
+		weight_1_price=int(input_dict_pa["weight_1_price"].get())
+		weight_2_time=int(input_dict_pa["weight_2_time"].get())
+		weight_3_envir=int(input_dict_pa["weight_3_envir"].get())
+		create_tender_solidity(web3,contract,tender_name,description,n_days_1,n_days_2,weight_1_price,weight_2_time,weight_3_envir)
+		messagebox.showinfo("Create Tender", "the function has been called successfully")
 	
+	except Exception as e:
+		messagebox.showerror("Create Tender", str(e) + " You might not have the permission to call this function")
+
 
     
 def create_tender_solidity(web3,contract,tender_name,description,n_days_1,n_days_2,weight_1_price,weight_2_time,weight_3_envir):
-    web3.eth.defaultAccount=web3.eth.accounts[0]
     contract.functions.CreateTender(tender_name,description,n_days_1,n_days_2,weight_1_price,weight_2_time,weight_3_envir).transact()
  
     
@@ -511,20 +814,25 @@ def create_tender_solidity(web3,contract,tender_name,description,n_days_1,n_days
     
 
 def allowed_companies_ids(web3,contract,input_dict):
-	list_allowed=input_dict["allowed_companies"].get().split(",")
-	for i in list_allowed:
-		contract.functions.CreatePA(web3.eth.accounts[int(i)]).transact()
-	messagebox.showinfo("Allowed Companies", "The companies have been added to the allowed list")
+	try:
+		list_allowed=input_dict["allowed_companies"].get().split(",")
+		for i in list_allowed:
+			contract.functions.CreatePA(web3.eth.accounts[int(i)]).transact()
+		messagebox.showinfo("Allowed Companies", "The companies have been added to the allowed list")
+	except Exception as e:
+		messagebox.showerror("Allowed Companies", str(e)+ " You might not have the permission to call this function")
 		
 
 def assign_winner(web3,contract,input_dict):
-    tender_id=int(input_dict["tender_id"].get())
-    web3.eth.defaultAccount=web3.eth.accounts[0]
-    contract.functions.compute_scores(tender_id).transact()
-    contract.functions.assign_winner(tender_id).transact()
-    winning_address,score=contract.functions.displayWinner(tender_id).call()
-    return web3.eth.accounts.index(winning_address)
-	messagebox.showinfo("Assign Winner", "The winner of the tender has been appointed")
+	try:
+		tender_id=int(input_dict["tender_id"].get())
+		contract.functions.compute_scores(tender_id).transact()
+		contract.functions.assign_winner(tender_id).transact()
+		winning_address,score=contract.functions.displayWinner(tender_id).call()
+		return web3.eth.accounts.index(winning_address)
+		messagebox.showinfo("Assign Winner", "The winner of the tender has been appointed")
+	except Exception as e:
+		messagebox.showerror("Allowed Companies", str(e)+ " You might not have the permission to call this function")
 
 
 
@@ -545,52 +853,63 @@ def get_tenders_status(web3,contract, input_dict):
 	return df
   
 def see_active_tenders(web3,contract, input_dict):
-	df=get_tenders_status(web3,contract,input_dict)
-	df = df[df["pending?"]==True]
-	#from here the code "print" the dataframe
-	input_dict['tv1']["column"] = list(df.columns)
-	input_dict['tv1']["show"] = "headings"
-	for column in input_dict['tv1']["columns"]:
-		input_dict['tv1'].heading(column, text=column) # let the column heading = column name
+	try:
 
-	df_rows = df.to_numpy().tolist() # turns the dataframe into a list of lists
-	for row in df_rows:
-		input_dict['tv1'].insert("", "end", values=row)
+		df=get_tenders_status(web3,contract,input_dict)
+		df = df[df["pending?"]==True]
+		#from here the code "print" the dataframe
+		input_dict['tv1']["column"] = list(df.columns)
+		input_dict['tv1']["show"] = "headings"
+		for column in input_dict['tv1']["columns"]:
+			input_dict['tv1'].heading(column, text=column) # let the column heading = column name
+
+		df_rows = df.to_numpy().tolist() # turns the dataframe into a list of lists
+		for row in df_rows:
+			input_dict['tv1'].insert("", "end", values=row)
+	except Exception as e:
+		messagebox.showerror("Allowed Companies", str(e))
 
     
 def see_closed_tenders(web3,contract, input_dict):
-	df=get_tenders_status(web3,contract,input_dict)
-	df = df[df["pending?"]==False]
-	#from here the code "print" the dataframe
-	input_dict['tv1']["column"] = list(df.columns)
-	input_dict['tv1']["show"] = "headings"
-	for column in input_dict['tv1']["columns"]:
-		input_dict['tv1'].heading(column, text=column) # let the column heading = column name
+	try:
+		df=get_tenders_status(web3,contract,input_dict)
+		df = df[df["pending?"]==False]
+		#from here the code "print" the dataframe
+		input_dict['tv1']["column"] = list(df.columns)
+		input_dict['tv1']["show"] = "headings"
+		for column in input_dict['tv1']["columns"]:
+			input_dict['tv1'].heading(column, text=column) # let the column heading = column name
 
-	df_rows = df.to_numpy().tolist() # turns the dataframe into a list of lists
-	for row in df_rows:
-		input_dict['tv1'].insert("", "end", values=row)
+		df_rows = df.to_numpy().tolist() # turns the dataframe into a list of lists
+		for row in df_rows:
+			input_dict['tv1'].insert("", "end", values=row)
+	except Exception as e:
+		messagebox.showerror("Allowed Companies", str(e))
 
 
 def get_bids_details(web3,contract,input_dict):
-
 	#### io clicco sul df delle closed tenders su una riga 
 	#e vado su questa nuova view: fattibile?come prendo input?
-	tender_id = int(input_dict['tender_id'].get())
-	num_bids=contract.functions.getResultsLenght(tender_id).call()
-	bids_list=[]
-	for i in range(0,num_bids):
-		bids_list.append(contract.functions.getBidDetails(tender_id,address).call())
-	df = pd.DataFrame(bids_list,columns=["name","description","separator","score","winner?"])
+	try:
+		tender_id = int(input_dict['tender_id'].get())
+		num_bids=contract.functions.getResultsLenght(tender_id).call()
+		bids_list=[]
+		for i in range(0,num_bids):
+			address,score,winner=contract.functions.getResultsValue(tender_id,i).call()
+			bids_list.append(contract.functions.getBidDetails(tender_id,address).call())
+			print(bids_list)
+		df = pd.DataFrame(bids_list,columns=["name","description","separator","score","winner?"])
 
-	input_dict['tv1']["column"] = list(df.columns)
-	input_dict['tv1']["show"] = "headings"
-	for column in input_dict['tv1']["columns"]:
-		input_dict['tv1'].heading(column, text=column) # let the column heading = column name
+		input_dict['tv1']["column"] = list(df.columns)
+		input_dict['tv1']["show"] = "headings"
+		for column in input_dict['tv1']["columns"]:
+			input_dict['tv1'].heading(column, text=column) # let the column heading = column name
 
-	df_rows = df.to_numpy().tolist() # turns the dataframe into a list of lists
-	for row in df_rows:
-		input_dict['tv1'].insert("", "end", values=row)
+		df_rows = df.to_numpy().tolist() # turns the dataframe into a list of lists
+		for row in df_rows:
+			input_dict['tv1'].insert("", "end", values=row)
+	except Exception as e:
+		messagebox.showerror("Allowed Companies", str(e))
 
 
     
@@ -600,27 +919,31 @@ def get_bids_details(web3,contract,input_dict):
 #### COMPANIES INTERFACE
 
 def send_bid(web3,contract, input_dict):
-    #inputdict={"user_id":"1","tender_id":"11","price":"38448","time":"120","envir":"4"}
-    user_id=int(input_dict["user_id"].get())
-    tender_id=int(input_dict["tender_id"].get())
-    price=input_dict["price"].get()
-    time=input_dict["time"].get()
-    envir=input_dict["envir"].get()
-    
-    list_values_to_hash=[price,time,envir]
-    unencrypted_message,separator=to_string_and_sep(list_values_to_hash)
-    hash=encrypt(unencrypted_message)
-    
-    send_bid_solidity(web3,contract,user_id,tender_id,hash)
-    save_txt(str(user_id),str(separator),unencrypted_message,str(tender_id))
-	messagebox.showinfo("Send bid", "The bid has been sent successfully")
+	try:
+		#inputdict={"user_id":"1","tender_id":"11","price":"38448","time":"120","envir":"4"}
+		tender_id=int(input_dict["tender_id"].get())
+		price=input_dict["price"].get()
+		time=input_dict["time"].get()
+		envir=input_dict["envir"].get()
+
+		list_values_to_hash=[price,time,envir]
+		unencrypted_message,separator=to_string_and_sep(list_values_to_hash)
+		hash=encrypt(unencrypted_message)
+
+		send_bid_solidity(web3,contract,tender_id,hash)
+		save_txt(str(user_id),str(separator),unencrypted_message,str(tender_id))
+		messagebox.showinfo("Send bid", "The bid has been sent successfully")
+	except Exception as e:
+		messagebox.showerror("Allowed Companies", str(e))
     
 def send_unencrypted(web3,contract, input_dict):
-	user_id = int(input_dict['user_id'].get())
-	##come funziona qua per l'input con il txt?
-	tender_id,unencrypted_message,separator=load_txt()
-	send_unencrypted_solidity(web3,contract,tender_id,user_id,unencrypted_message,separator)
-	messagebox.showinfo("Bid Completed", "The unencripted bid has been sent")
+	try:
+		##come funziona qua per l'input con il txt?
+		tender_id,unencrypted_message,separator=load_txt()
+		send_unencrypted_solidity(web3,contract,tender_id,unencrypted_message,separator)
+		messagebox.showinfo("Bid Completed", "The unencripted bid has been sent")
+	except Exception as e:
+		messagebox.showerror("Allowed Companies", str(e))
 
 
 
@@ -646,8 +969,7 @@ def encrypt(unencrypted_message):
     print(hash)
     return hash
 
-def send_bid_solidity(web3,contract,user_id,tender_id,hash):
-    web3.eth.defaultAccount=web3.eth.accounts[int(user_id)]
+def send_bid_solidity(web3,contract,tender_id,hash):
     contract.functions.placeBid(int(tender_id),hash).transact()
 
 def save_txt(user_id,separator,unencrypted_message,tender_id):
@@ -665,9 +987,7 @@ def load_txt():
 	print(separator,unencrypted_message,tender_id)
 	return tender_id,unencrypted_message,separator
 
-def send_unencrypted_solidity(web3,contract,tender_id,user_id,unencrypted_message,separator):
-    
-    web3.eth.defaultAccount=web3.eth.accounts[int(user_id)]
+def send_unencrypted_solidity(web3,contract,tender_id, unencrypted_message,separator):
     contract.functions.concludeBid(int(tender_id),unencrypted_message,separator).transact()
     
 
