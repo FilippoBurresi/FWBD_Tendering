@@ -90,8 +90,8 @@ contract TenderingSmartContract is PA {
         c.tenderName = _tenderName;
         c.description = _description;
         c.bidOpeningDate = now;
-        c.bidSubmissionClosingDateHash= now + (_daysUntilClosingDateHash* 1 days);
-        c.bidSubmissionClosingDateData = now + (_daysUntilClosingDateData * 1 days);
+        c.bidSubmissionClosingDateHash= now + (_daysUntilClosingDateHash* 1 seconds);
+        c.bidSubmissionClosingDateData = now + (_daysUntilClosingDateData* 1 seconds);
         c.tenderingInstitution = msg.sender;
         c.evaluation_weights.push(w1);
         c.evaluation_weights.push(w2);
