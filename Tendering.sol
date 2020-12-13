@@ -110,7 +110,6 @@ contract TenderingSmartContract is PA {
         uint sum = w1.add(w2.add(w3));
         require(sum == 100, 'sum must be 100');
         require(_daysUntilClosingDateData > _daysUntilClosingDateHash);
-        require ((w3>0 && w3 <5), 'w3 accepts values from 1 to 4');
         // the value of tenderKeys specifies the id the created tender
         Tender storage c = tenders[tenderKeys];
         c.tender_id = tenderKeys;
