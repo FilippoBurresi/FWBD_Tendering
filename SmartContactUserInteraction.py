@@ -15,7 +15,7 @@ web3=Web3(Web3.HTTPProvider(ganache_URL))
 web3.eth.defaultAccount=web3.eth.accounts[0]
 account_list = web3.eth.accounts
 abi=json.loads(abi) # we can change the name of the variable
-address=web3.toChecksumAddress("0xd8b934580fcE35a11B58C6D73aDeE468a2833fa8")
+address=web3.toChecksumAddress("0x5bb390ADED79E911e987a56964CCE9D24eF2323F")
 contract=web3.eth.contract(address=address,abi=abi)
 
 # USER INTERFACE
@@ -23,7 +23,7 @@ contract=web3.eth.contract(address=address,abi=abi)
 # creating the main window
 window = Tk()
 window.title("Smart Contract Tendering")
-window.geometry('550x750')
+window.geometry('600x750')
 
 #creating tabS
 tab_parent = ttk.Notebook(window)

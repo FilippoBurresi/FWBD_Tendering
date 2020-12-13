@@ -768,15 +768,15 @@ abi = """[
 	}
 ]"""
 
-function_info = {'CreateTender': "questa è la descrizione di create tender",
-			   'placeBid': 'questa è la descrizione per plaeBid',
-			   'concludeBid': 'questa è la descrizione per conclude bid',
+function_info = {'CreateTender': "This function is used to create tenders and can only be called by the public administration. The first time variable indicates in how many days the tender will expire, while the second expiry indicates how soon the complete offers can be loaded and within which the hash must be loaded.The weights indicate the importance that we want the price, the speed of execution and the environmental impact to have, their sum must be equal to 100.",
+			   'placeBid': 'This function is used to make an offer to the tender indicated by the tender id. It can only be used by PA approved contractors. The price in euros, the execution time in days and the environmental impact must be indicated (indicated on a scale of 1 to 4). Once the function is called, it will insert the hash of the offer in the blockchain and create a file with the information necessary to complete the offer that will be saved in the working directory',
+			   'concludeBid': 'By clicking "File" upload the file created in the previous step to complete the offer. Once the file has been loaded, the path will be displayed to the right of the button. At this point it is possible to complete the offer by clicking "Call".',
 			   'getTenderStatus': 'questa è la descrizione per get tender status vediamo come viene',
-			   'seeActiveTenders': 'questa è la descrizione per see active tenders vediamo come viene se la faccio più lunga',
-			   'seeClosedTenders': 'questa è la descrizione per see closed tenders vediamo come viene',
-			   'allowCompanies': 'descrizione fakfjaòfdsa',
-			   "getBidsDetails": 'description dfjaskldfnaòsdfnadfjal',
-			   'assignWinner': 'fasdfalksdnaskdnfaksnf',}
+			   'seeActiveTenders': 'Through this function, citizens and contractor can see the details of currently active tenders. To better visualize the content, you can resize the width of the columns.',
+			   'seeClosedTenders': 'Through this function, citizens and contractor can see the details of closed tenders. To better visualize the content, you can resize the width of the columns.',
+			   'allowCompanies': 'This function allows companies to give permission to bid. The input is the account index for convenience and more than one can be entered at a time if separated by commas (in a normal scenario the input would be the address)',
+			   "getBidsDetails": 'Through this function it is possible given the tender id of a completed tender to see the details of all the offers presented.',
+			   'assignWinner': 'This function allows you to assign the winner to the tender specified by the id (only after the deadline), who will be awarded automatically by evaluating the offers made by the contractors according to the parameters entered in the tender.',}
 # Web3 function
 
 #### PA INTERFACE
@@ -860,6 +860,8 @@ def see_active_tenders(web3,contract, input_dict):
 		df = df[df["pending?"]==True]
 		#from here the code "print" the dataframe
 		input_dict['tv1']["column"] = list(df.columns)
+		for column in input_dict['tv1']["column"]:
+			input_dict['tv1'].column(column,minwidth=0, width=78, stretch=NO)
 		input_dict['tv1']["show"] = "headings"
 		for column in input_dict['tv1']["columns"]:
 			input_dict['tv1'].heading(column, text=column) # let the column heading = column name
@@ -878,6 +880,8 @@ def see_closed_tenders(web3,contract, input_dict):
 		df = df[df["pending?"]==False]
 		#from here the code "print" the dataframe
 		input_dict['tv1']["column"] = list(df.columns)
+		for column in input_dict['tv1']["column"]:
+			input_dict['tv1'].column(column,minwidth=0, width=78, stretch=NO)
 		input_dict['tv1']["show"] = "headings"
 		for column in input_dict['tv1']["columns"]:
 			input_dict['tv1'].heading(column, text=column) # let the column heading = column name
@@ -904,6 +908,8 @@ def get_bids_details(web3,contract,input_dict):
 		df = pd.DataFrame(bids_list,columns=["name","description","separator","score","winner?"])
 
 		input_dict['tv1']["column"] = list(df.columns)
+		for column in input_dict['tv1']["column"]:
+			input_dict['tv1'].column(column,minwidth=0, width=78, stretch=NO)
 		input_dict['tv1']["show"] = "headings"
 		for column in input_dict['tv1']["columns"]:
 			input_dict['tv1'].heading(column, text=column) # let the column heading = column name
@@ -924,7 +930,6 @@ def get_bids_details(web3,contract,input_dict):
 def send_bid(web3,contract, input_dict):
 	try:
 		#inputdict={"user_id":"1","tender_id":"11","price":"38448","time":"120","envir":"4"}
-		print(web3.eth.defaultAccount)
 		tender_id=int(input_dict["tender_id"].get())
 		price=input_dict["price"].get()
 		time=input_dict["time"].get()
@@ -935,7 +940,7 @@ def send_bid(web3,contract, input_dict):
 		hash=encrypt(unencrypted_message)
 
 		send_bid_solidity(web3,contract,tender_id,hash)
-		save_txt(str(user_id),str(separator),unencrypted_message,str(tender_id))
+		save_txt(str(web3.eth.defaultAccount),str(separator),unencrypted_message,str(tender_id))
 		messagebox.showinfo("Send bid", "The bid has been sent successfully")
 	except Exception as e:
 		messagebox.showerror("Allowed Companies", str(e))
@@ -1010,7 +1015,7 @@ def makeform(root, fields, title="Lorem Ipsum", description="Lorem Ipsum descrip
 	lab.pack(side=LEFT)
 	row = Frame(root)
 	row.pack(fill = X, padx = 5, pady = 5)
-	lab = Label(row, text = description,font=(None, 10), wraplength = 450, justify = LEFT )
+	lab = Label(row, text = description,font=(None, 10), wraplength = 580, justify = LEFT )
 	lab.pack(side=LEFT)
 	for field in fields:
 		row = Frame(root)
@@ -1022,9 +1027,9 @@ def makeform(root, fields, title="Lorem Ipsum", description="Lorem Ipsum descrip
 		ent.pack(side = RIGHT, expand = YES, fill = X)
 		entries[field] = ent
 	if view:
-		row = LabelFrame(root, text="Data", height=250, width=600)
-		sub_row1 = Frame(row)
-		sub_row2 = Frame(row)
+		#row = LabelFrame(root, text="Data", height=250, width=600)
+		sub_row1 = Frame(root)
+		sub_row2 = Frame(root)
 		tv1 = ttk.Treeview(sub_row1)   
 		treescrolly = Scrollbar(sub_row1, orient="vertical", command=tv1.yview) 
 		treescrollx = Scrollbar(sub_row2, orient="horizontal", command=tv1.xview) 
