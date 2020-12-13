@@ -231,10 +231,8 @@ contract TenderingSmartContract is PA {
      * of a very small weight assigned to this variable.
      * Therefore, adjusting the measures is fundamental to make things fair and to 
      * make each variable as important as the related weight requires.
-     * @param _thingToLook is the variable of reference 
+     * @param _thingToLook is the variable of reference according to which rescaling the other variable (in our case the price)
      * @param _thingToAdjust is the variable whose scale of size needs to be changed
-     * according to which rescaling the other variable (in our case the price)
-     * 
      */
     function adjust_measures(uint _thingToLook, uint _thingToAdjust) private returns(uint) {
 
