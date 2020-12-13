@@ -817,7 +817,7 @@ def allowed_companies_ids(web3,contract,input_dict):
 	try:
 		list_allowed=input_dict["allowed_companies"].get().split(",")
 		for i in list_allowed:
-			contract.functions.CreatePA(web3.eth.accounts[int(i)]).transact()
+			contract.functions.addFirm(web3.eth.accounts[int(i)]).transact()
 		messagebox.showinfo("Allowed Companies", "The companies have been added to the allowed list")
 	except Exception as e:
 		messagebox.showerror("Allowed Companies", str(e)+ " You might not have the permission to call this function")

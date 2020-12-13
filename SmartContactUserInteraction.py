@@ -15,7 +15,7 @@ web3=Web3(Web3.HTTPProvider(ganache_URL))
 web3.eth.defaultAccount=web3.eth.accounts[0]
 account_list = web3.eth.accounts
 abi=json.loads(abi) # we can change the name of the variable
-address=web3.toChecksumAddress("0x3D44185CB4ED9B211f6774fFf4bcE51dc758fEd8")
+address=web3.toChecksumAddress("0x44a8ccaFf70F7ea3Fc51998455d9ABC5C0c74f78")
 contract=web3.eth.contract(address=address,abi=abi)
 
 # USER INTERFACE
@@ -42,7 +42,6 @@ tab_parent.pack(expand=1, fill='both')
 # login interface
 def set_account():
     web3.eth.defaultAccount = account_tkvariable.get().split()[1]
-    print(web3.eth.defaultAccount)
 account_id_list = [str(i) for i in range(10)]
 account_name_list = ['Public Administration', '1','2','3','4','5','6','7','8','Citizen']
 selection_list = [' '.join(i) for i in zip(account_id_list, account_list, account_name_list)]
