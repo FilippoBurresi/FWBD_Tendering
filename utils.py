@@ -818,6 +818,7 @@ def allowed_companies_ids(web3,contract,input_dict):
 		list_allowed=input_dict["allowed_companies"].get().split(",")
 		for i in list_allowed:
 			contract.functions.addFirm(web3.eth.accounts[int(i)]).transact()
+			print(web3.eth.accounts[int(i)])
 		messagebox.showinfo("Allowed Companies", "The companies have been added to the allowed list")
 	except Exception as e:
 		messagebox.showerror("Allowed Companies", str(e)+ " You might not have the permission to call this function")
@@ -854,7 +855,7 @@ def get_tenders_status(web3,contract, input_dict):
   
 def see_active_tenders(web3,contract, input_dict):
 	try:
-
+		input_dict['tv1'].delete(*input_dict['tv1'].get_children()) 
 		df=get_tenders_status(web3,contract,input_dict)
 		df = df[df["pending?"]==True]
 		#from here the code "print" the dataframe
@@ -872,6 +873,7 @@ def see_active_tenders(web3,contract, input_dict):
     
 def see_closed_tenders(web3,contract, input_dict):
 	try:
+		input_dict['tv1'].delete(*input_dict['tv1'].get_children()) 
 		df=get_tenders_status(web3,contract,input_dict)
 		df = df[df["pending?"]==False]
 		#from here the code "print" the dataframe
@@ -891,6 +893,7 @@ def get_bids_details(web3,contract,input_dict):
 	#### io clicco sul df delle closed tenders su una riga 
 	#e vado su questa nuova view: fattibile?come prendo input?
 	try:
+		input_dict['tv1'].delete(*input_dict['tv1'].get_children()) 
 		tender_id = int(input_dict['tender_id'].get())
 		num_bids=contract.functions.getResultsLenght(tender_id).call()
 		bids_list=[]
@@ -921,6 +924,7 @@ def get_bids_details(web3,contract,input_dict):
 def send_bid(web3,contract, input_dict):
 	try:
 		#inputdict={"user_id":"1","tender_id":"11","price":"38448","time":"120","envir":"4"}
+		print(web3.eth.defaultAccount)
 		tender_id=int(input_dict["tender_id"].get())
 		price=input_dict["price"].get()
 		time=input_dict["time"].get()
