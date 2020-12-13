@@ -165,11 +165,12 @@ contract TenderingSmartContract is PA {
         require(tenders[_tenderKey].bids[msg.sender].contractor == msg.sender);
         // check that the hash corresponds
         require(keccak256(abi.encodePacked(_description)) == tenders[_tenderKey].bids[msg.sender].hashOffer);
+        Tender storage c = tenders[_tenderKey];
         // finally conclude the bid by submitting the description
-        tenders[_tenderKey].bids[msg.sender].description = _description;
+        c.bids[msg.sender].description = _description;
         //memorizing the separator used in each bid
-        tenders[_tenderKey].bids[msg.sender].separator = _separator;
-        tenders[_tenderKey].bids[msg.sender].valid = true;
+        c.bids[msg.sender].separator = _separator;
+        c.bids[msg.sender].valid = true;
 
     }
 
