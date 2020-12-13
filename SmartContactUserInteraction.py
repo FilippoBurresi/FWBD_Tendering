@@ -15,7 +15,7 @@ web3=Web3(Web3.HTTPProvider(ganache_URL))
 web3.eth.defaultAccount=web3.eth.accounts[0]
 account_list = web3.eth.accounts
 abi=json.loads(abi) # we can change the name of the variable
-address=web3.toChecksumAddress("0x44a8ccaFf70F7ea3Fc51998455d9ABC5C0c74f78")
+address=web3.toChecksumAddress("0xd8b934580fcE35a11B58C6D73aDeE468a2833fa8")
 contract=web3.eth.contract(address=address,abi=abi)
 
 # USER INTERFACE
