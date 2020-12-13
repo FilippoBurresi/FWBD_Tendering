@@ -10,8 +10,7 @@ contract TenderingSmartContract is PA {
     using SafeMath for uint;
     using strings for *;
 
-    address owner;
-    mapping (address => bool) public allowedInstitution;
+    mapping (address => bool) private allowedInstitution;
 
     struct BiddingOffer {
         address contractor;
@@ -22,7 +21,7 @@ contract TenderingSmartContract is PA {
         string[] NewDescription;
     }
 
-    struct Tender {
+    struct Tender  {
         uint256 tender_id;
         uint256 bidOpeningDate;
         uint256 bidSubmissionClosingDateData;
@@ -39,16 +38,16 @@ contract TenderingSmartContract is PA {
         string description;
     }
 
-    uint[] public tenderList; //list of tender keys so we can enumarate them
-    uint public tenderKeys;
-    mapping (uint => Tender) public tenders;
+    uint[] private tenderList; //list of tender keys so we can enumarate them
+    uint private tenderKeys;
+    mapping (uint => Tender) private tenders;
 
     // needed for the evaluation part
     mapping(uint => address[]) private _participants; //from tenderKey => list of participants
     mapping(uint => uint[])  private _scores; //from tenderKey => list of scores
 
     // added this for the displayWinner function below. See there for more details
-    mapping(uint => address) tenderIdToWinner; // from tenderId => address of the winner
+    mapping(uint => address) private tenderIdToWinner; // from tenderId => address of the winner
 
     modifier inTimeHash (uint256 _tenderKey) {
         require(
@@ -79,8 +78,8 @@ contract TenderingSmartContract is PA {
         _;
     }
 
-    function CreateTender(string memory _tenderName, string memory _description,uint256 _daysUntilClosingDateData, uint256 _daysUntilClosingDateHash,
-                            uint w1, uint w2, uint w3) public onlyPA{
+    function CreateTender(string calldata _tenderName, string calldata _description,uint256  _daysUntilClosingDateData, uint256 _daysUntilClosingDateHash,
+                            uint w1, uint w2, uint w3) external onlyPA{
         uint sum = w1.add(w2.add(w3));
         require(sum == 100, 'sum must be 100');
         require(_daysUntilClosingDateData > _daysUntilClosingDateHash);
@@ -101,7 +100,7 @@ contract TenderingSmartContract is PA {
             }
 
     // this function allowed contractors to participate the tender by sumbitting the hash
-    function placeBid (uint256 _tenderKey, bytes32 _hashOffer) public onlyFirm inTimeHash(_tenderKey) AlreadyPlacedBid(_tenderKey) {
+    function placeBid (uint256 _tenderKey, bytes32 _hashOffer) external onlyFirm inTimeHash(_tenderKey) AlreadyPlacedBid(_tenderKey) {
         Tender storage c = tenders[_tenderKey];
         c.AlreadyBid[msg.sender] = true;
         c.bids[msg.sender] = BiddingOffer(msg.sender,_hashOffer,false,"","", new string[](0));
@@ -110,7 +109,7 @@ contract TenderingSmartContract is PA {
     }
 
     // after the deadline contractors can send the actual offer
-    function concludeBid(uint256 _tenderKey, string memory _description, string memory _separator) public onlyFirm inTimeData(_tenderKey) {
+    function concludeBid(uint256 _tenderKey, string calldata _description, string calldata _separator) external onlyFirm inTimeData(_tenderKey) {
 
         //assert that the it is the bids of the contractor that it is trying to conclude the Bid
         require(tenders[_tenderKey].bids[msg.sender].contractor == msg.sender);
@@ -124,7 +123,7 @@ contract TenderingSmartContract is PA {
 
     }
 
-    function SMT(string memory _phrase,string memory _separator ) private returns(string[] memory) {
+    function SMT(string memory _phrase,string memory _separator )  private pure returns(string[] memory) {
         strings.slice memory s = _phrase.toSlice();
         strings.slice memory delim = _separator.toSlice();
         string[] memory parts = new string[](s.count(delim));
@@ -136,7 +135,7 @@ contract TenderingSmartContract is PA {
     }
 
     function parseInt(string memory _value)
-        public
+        private pure
         returns (uint _ret) {
         bytes memory _bytesValue = bytes(_value);
         uint j = 1;
@@ -157,7 +156,7 @@ contract TenderingSmartContract is PA {
         }
     }
 
-    function adjust_measures(uint _thingToLook, uint _thingToAdjust) private returns(uint) {
+    function adjust_measures(uint _thingToLook, uint _thingToAdjust) pure private returns(uint) {
 
         uint n_times;
         uint _thingNew = _thingToLook;
@@ -168,7 +167,7 @@ contract TenderingSmartContract is PA {
         return ( _thingToAdjust.mul(10 ** n_times));
     }
 
-    function compute_scores(uint _tenderKey) public onlyPA afterDeadline(_tenderKey) {
+    function compute_scores(uint _tenderKey) external onlyPA afterDeadline(_tenderKey) {
         uint w1 = tenders[_tenderKey].evaluation_weights[0]; // weight associated to price
         uint w2 = tenders[_tenderKey].evaluation_weights[1]; // weight associated to timing
         uint w3 = tenders[_tenderKey].evaluation_weights[2]; // weight associated to environmental safeguard level, i.e. four categories: 1 [highest] to 4 [lowest]
@@ -196,7 +195,7 @@ contract TenderingSmartContract is PA {
         }
     }
 
-    function assign_winner(uint _tenderKey) public onlyPA afterDeadline(_tenderKey) {
+    function assign_winner(uint _tenderKey) external onlyPA afterDeadline(_tenderKey) {
         uint winning_score = _scores[_tenderKey][0];
         uint winning_index;
 
@@ -214,7 +213,7 @@ contract TenderingSmartContract is PA {
         //return (_participants[_tenderKey][winning_index], winning_score);
     }
 
-    function displayWinner(uint _tenderKey) public afterDeadline(_tenderKey) returns (address, uint) {
+    function displayWinner(uint _tenderKey)  external view afterDeadline(_tenderKey) returns (address, uint) {
         return (tenderIdToWinner[_tenderKey], tenders[_tenderKey].addressToScore[tenderIdToWinner[_tenderKey]]);
         /*
         Alternatively, we can simply return tenders[_tenderKey].winningContractor
@@ -223,11 +222,11 @@ contract TenderingSmartContract is PA {
         */
     }
 
-    function getResultsLenght(uint _tenderKey) public view afterDeadline(_tenderKey) returns(uint) {
-        return _participants[_tenderKey].length;
+    function getResultsLenght(uint _tenderKey) external view afterDeadline(_tenderKey) returns(uint) {
+        return (_participants[_tenderKey].length);
     }
 
-    function getResultsValue(uint _tenderKey, uint _index) public view afterDeadline(_tenderKey) returns (address,uint, bool) {
+    function getResultsValue(uint _tenderKey, uint _index) external view afterDeadline(_tenderKey) returns (address,uint, bool) {
 
         bool is_winner;
         if (tenders[_tenderKey].winningContractor == _participants[_tenderKey][_index]) {
@@ -239,7 +238,7 @@ contract TenderingSmartContract is PA {
         return (_participants[_tenderKey][_index], _scores[_tenderKey][_index], is_winner);
     }
 
-    function getBidDetails(uint _tenderKey, address _index) public view afterDeadline(_tenderKey) returns (address, string[] memory, string memory, uint, bool) {
+    function getBidDetails(uint _tenderKey, address _index) external view afterDeadline(_tenderKey) returns (address, string[] memory, string memory, uint, bool) {
         address name_contractor = tenders[_tenderKey].bids[_index].contractor;
         string[] memory text_description = tenders[_tenderKey].bids[_index].NewDescription;
         string memory sep = tenders[_tenderKey].bids[_index].separator; // thus, one can check if the score was correct by using the separator and the description
@@ -257,11 +256,11 @@ contract TenderingSmartContract is PA {
         return (name_contractor, text_description, sep, score, is_winner);
     }
 
-    function getTendersLength() public returns(uint) {
+    function getTendersLength() external view returns(uint) {
         return (tenderKeys);
     }
 
-    function isPending(uint _tenderKey) public returns(uint, bool) {
+    function isPending(uint _tenderKey) external view returns(uint, bool) {
 
         bool pending_status;
 
@@ -273,7 +272,7 @@ contract TenderingSmartContract is PA {
         return (_tenderKey, pending_status);
     }
 
-    function see_TenderDetails(uint _tenderKey) public returns (uint  tender_id, string memory tenderName,string memory description,
+    function see_TenderDetails(uint _tenderKey) external view returns (uint  tender_id, string memory tenderName,string memory description,
                                 uint[] memory evaluation_weights, address[] memory firms, address winningContractor){
 
         return (tenders[_tenderKey].tender_id, tenders[_tenderKey].tenderName, tenders[_tenderKey].description, tenders[_tenderKey].evaluation_weights, _participants[_tenderKey], tenders[_tenderKey].winningContractor);
