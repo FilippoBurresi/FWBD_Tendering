@@ -5,6 +5,12 @@ import "./strings.sol";
 import "./SafeMath.sol";
 import "./PA.sol";
 
+/// @title A smart contract for tendering procedures
+/// @notice The contract takes into account all the four parts that define a tendering: 
+/// - the request part, where an allowed public administration issues a request for tender with all information;
+/// - the bidding part, where each allowed firm can send a bid in response to a request for tender;
+/// - the evaluation part, where the scores are computed and the winner is assigned; 
+/// - the publishing part, where people can access the results of the tendering in question. 
 contract TenderingSmartContract is PA {
 
     using SafeMath for uint;
@@ -46,7 +52,7 @@ contract TenderingSmartContract is PA {
     mapping(uint => address[]) private _participants; // from tender id => list of participants
     mapping(uint => uint[])  private _scores; // from tender id => list of scores
 
-    mapping(uint => address) private tenderIdToWinner; // from tenderId => address of the winner
+    //mapping(uint => address) private tenderIdToWinner; // from tenderId => address of the winner
 
     /**
      * a modifier to check that an encrypted bid is sent between the bid opening date and the first
@@ -110,6 +116,7 @@ contract TenderingSmartContract is PA {
         uint sum = w1.add(w2.add(w3));
         require(sum == 100, 'sum must be 100');
         require(_daysUntilClosingDateData > _daysUntilClosingDateHash);
+        
         // the value of tenderKeys specifies the id the created tender
         Tender storage c = tenders[tenderKeys];
         c.tender_id = tenderKeys;
@@ -145,36 +152,8 @@ contract TenderingSmartContract is PA {
         c.bids[msg.sender] = BiddingOffer(msg.sender,_hashOffer,false,"","", new string[](0));
         _participants[_tenderKey].push(msg.sender);
     }
-
-
-    /**
-     * @notice concludeBid can only be called by an authorized firm to conclude a bid,
-     * by sending the unencrypted offer before the second (data) deadline.
-     * @param _tenderKey is the id of the tender the bid refers to.
-     * @param _description is a string containing the price, the realization time and the environment score.
-     * @param _separator indicates the separator that arises between these three elements.
-     *
-     * Requirements:
-     * - the firm concluding the Bid has to match the firm that has placed that Bid
-     * - The hash sent at the beginning has to match the hash of the unencrypted bid.
-     */
-    function concludeBid(uint256 _tenderKey, string calldata _description, string calldata _separator) external onlyFirm inTimeData(_tenderKey) {
-
-        /* assert that the contractor who is trying to conclude the Bid
-        is the one who has placed the bid in the first palce */
-        require(tenders[_tenderKey].bids[msg.sender].contractor == msg.sender);
-        // check that the hash corresponds
-        require(keccak256(abi.encodePacked(_description)) == tenders[_tenderKey].bids[msg.sender].hashOffer);
-        Tender storage c = tenders[_tenderKey];
-        // finally conclude the bid by submitting the description
-        c.bids[msg.sender].description = _description;
-        //memorizing the separator used in each bid
-        c.bids[msg.sender].separator = _separator;
-        c.bids[msg.sender].valid = true;
-
-    }
-
-
+    
+    
     /**
      * @notice this function is based on the String & slice utility library.
      * It performs the splitting of a string according to a specified separator
@@ -205,6 +184,34 @@ contract TenderingSmartContract is PA {
         }
     }
 
+
+    /**
+     * @notice concludeBid can only be called by an authorized firm to conclude a bid,
+     * by sending the unencrypted offer before the second (data) deadline.
+     * @param _tenderKey is the id of the tender the bid refers to.
+     * @param _description is a string containing the price, the realization time and the environment score.
+     * @param _separator indicates the separator that arises between these three elements.
+     *
+     * Requirements:
+     * - the firm concluding the Bid has to match the firm that has placed that Bid
+     * - The hash sent at the beginning has to match the hash of the unencrypted bid.
+     */
+    function concludeBid(uint256 _tenderKey, string calldata _description, string calldata _separator) external onlyFirm inTimeData(_tenderKey) {
+
+        /* assert that the contractor who is trying to conclude the Bid
+        is the one who has placed the bid in the first palce */
+        require(tenders[_tenderKey].bids[msg.sender].contractor == msg.sender);
+        // check that the hash corresponds
+        require(keccak256(abi.encodePacked(_description)) == tenders[_tenderKey].bids[msg.sender].hashOffer);
+        Tender storage c = tenders[_tenderKey];
+        // finally conclude the bid by submitting the description
+        c.bids[msg.sender].description = _description;
+        //memorizing the separator used in each bid
+        c.bids[msg.sender].separator = _separator;
+        c.bids[msg.sender].valid = true;
+    }
+
+
     /**
      * @notice this function is called by the PA after the tender is closed to
      * split each bidding offer.
@@ -222,6 +229,7 @@ contract TenderingSmartContract is PA {
             tenders[_tenderKey].bids[_participants[_tenderKey][i]].NewDescription = SMT(descriptionAtTheMoment,separatorToUse);
         }
     }
+
 
     /** @notice this function makes some changes on the measures the three elements characterizing
      * each offer are expressed with.
@@ -250,6 +258,7 @@ contract TenderingSmartContract is PA {
         return ( _thingToAdjust.mul(10 ** n_times));
     }
 
+
     /**
      * @notice compute_scores function is called by the PA after the tender is closed to evaluate
      * all the offers.
@@ -257,7 +266,7 @@ contract TenderingSmartContract is PA {
      * and before computing the weighted averages, the adjust_measures function is called
      * in order to make the time and the environment_score comparable with the price
      */
-    function compute_scores(uint _tenderKey) external onlyPA afterDeadline(_tenderKey) {
+    function compute_scores(uint _tenderKey) public onlyPA afterDeadline(_tenderKey) {
         // weight associated to price
         uint w1 = tenders[_tenderKey].evaluation_weights[0];
         // weight associated to timing
@@ -274,9 +283,10 @@ contract TenderingSmartContract is PA {
             if (to_store.valid == true){
 
                 //to make timing and envir comparable with price
+                // e.g. if price=10000 and env=2 then envir_adj = 20000
                 uint price = parseInt(to_store.NewDescription[0]);
                 uint timing = adjust_measures(price, parseInt(to_store.NewDescription[1]));
-                // e.g. if price=10000 and env=2 then envir_adj = 20000
+                //assert((to_store.NewDescription[2]>0 && to_store.NewDescription[2] <5)); // BUT it reverts ALL the function if false
                 uint environment = adjust_measures(price, parseInt(to_store.NewDescription[2]));
                 uint score = w1.mul(price);
                 score = score.add(w2.mul(timing));
@@ -298,7 +308,7 @@ contract TenderingSmartContract is PA {
      * In case of the same score between two bidders,
      * the firm which sent the bidding first is preferred.
      */
-    function assign_winner(uint _tenderKey) external  onlyPA afterDeadline(_tenderKey) {
+    function assign_winner(uint _tenderKey) public  onlyPA afterDeadline(_tenderKey) {
         uint winning_score = _scores[_tenderKey][0];
         uint winning_index;
 
@@ -311,7 +321,7 @@ contract TenderingSmartContract is PA {
             }
         }
         tenders[_tenderKey].winningContractor = _participants[_tenderKey][winning_index];
-        tenderIdToWinner[_tenderKey] = _participants[_tenderKey][winning_index];
+        //tenderIdToWinner[_tenderKey] = _participants[_tenderKey][winning_index];
         //emit Winner_display("We have a winner!", _tenderKey, _participants[_tenderKey][winning_index], winning_score);
         //return (_participants[_tenderKey][winning_index], winning_score);
     }
@@ -320,8 +330,8 @@ contract TenderingSmartContract is PA {
      * @notice displayWinner function can be called by any citizen after the tender is closed.
      * @return the address of the winner and its score.
      */
-    function displayWinner(uint _tenderKey) external view afterDeadline(_tenderKey) returns (address, uint) {
-        return (tenderIdToWinner[_tenderKey], tenders[_tenderKey].addressToScore[tenderIdToWinner[_tenderKey]]);
+    function displayWinner(uint _tenderKey) public view afterDeadline(_tenderKey) returns (address, uint) {
+        return (tenders[_tenderKey].winningContractor, tenders[_tenderKey].addressToScore[tenders[_tenderKey].winningContractor]);
         /*
         Alternatively, we can simply return tenders[_tenderKey].winningContractor
         Check which option consumes less gas. And, if tenders[_tenderKey].winningContractor consumes less,
@@ -388,7 +398,7 @@ contract TenderingSmartContract is PA {
     }
 
     /**
-     * @notice this function allows to visualize the status of a speficix tender.
+     * @notice this function allows to visualize the status of a speficic tender.
      * A tender is pending if the first deadline has already passed
      * (meaning that new hashed offers cannot be accepted anymore)
      * @return the tender_id we are interested in and its pending status.
@@ -408,18 +418,15 @@ contract TenderingSmartContract is PA {
     /**
      * @notice this function allows to visualize some information related to a specific tender.
      * It returns the id of the tender we are interested in, its name, its description,
-     * the weights chosen to evaluate the offers with, the participants addresses
+     * the weights chosen to evaluate the offers with, the number of participants 
      * and the final winner.
      */
     function see_TenderDetails(uint _tenderKey) external view returns (uint  tender_id, string memory tenderName,string memory description,
-                                uint[] memory evaluation_weights, address[] memory firms, address winningContractor){
+                                uint[] memory evaluation_weights, uint firms, address winningContractor){
 
-        return (tenders[_tenderKey].tender_id, tenders[_tenderKey].tenderName, tenders[_tenderKey].description, tenders[_tenderKey].evaluation_weights, _participants[_tenderKey], tenders[_tenderKey].winningContractor);
+        return (tenders[_tenderKey].tender_id, tenders[_tenderKey].tenderName, tenders[_tenderKey].description, tenders[_tenderKey].evaluation_weights, _participants[_tenderKey].length, tenders[_tenderKey].winningContractor);
 
-        /*
-        Now, this function returns the list of all the contractors that sent a bid.
-        Check if it is better for gas costs returning only the length of bidList instead of all the addresses.
-        */
     }
 
 }
+
