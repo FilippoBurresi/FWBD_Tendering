@@ -151,7 +151,7 @@ contract TenderingSmartContract is PA {
         c.AlreadyBid[msg.sender] = true;
         // a new offer is created. All the elements a BiddingOffer type is made of are inserted
         c.bids[msg.sender] = BiddingOffer(msg.sender,_hashOffer,false,"","", new string[](0));
-        _participants[_tenderKey].push(msg.sender);
+        //_participants[_tenderKey].push(msg.sender); // moved to concludeBid
     }
     
     
@@ -210,6 +210,7 @@ contract TenderingSmartContract is PA {
         //memorizing the separator used in each bid
         c.bids[msg.sender].separator = _separator;
         c.bids[msg.sender].valid = true;
+        _participants[_tenderKey].push(msg.sender); // only firms with valid bids are considered
     }
 
 
