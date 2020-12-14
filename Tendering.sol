@@ -1,9 +1,9 @@
 pragma solidity >0.4.13 <0.7.0;
 pragma experimental ABIEncoderV2;
 
-import "./strings.sol";
+import "./strings.sol"; // needed for splitting text later
 import "./SafeMath.sol";
-import "./PA.sol";
+import "./PA.sol"; // needed for access control
 
 /// @title A smart contract for tendering procedures
 /// @notice The contract takes into account all the four parts that define a tendering: 
