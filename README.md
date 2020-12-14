@@ -44,9 +44,12 @@ The previous step can be performed by choosing every account in the in the login
 
 ## **Optimization**
 
-The code in Tendering.sol has been optimized so to spend less gas as we can in transactions. This is crucial to make our project appealing to both public administrations and firms. Indeed, our goal is to show how easy, transparent and cheap are Blockchain-based tendering procedures to these two main actors. On the other hand, citizens do not spend any gas in checking the tendering since we took care of expressing those functions as pure/view. 
+The code in ```Tendering.sol``` has been optimized so to spend less gas as we can in transactions. This is crucial to make our project appealing to both public administrations and firms. Indeed, our goal is to show how easy, transparent and cheap are Blockchain-based tendering procedures to these two main actors. On the other hand, citizens do not spend any gas in checking the tendering since we took care of expressing those functions as pure/view. 
 
 To optimize the smart contract we combined different adjustments: from eliminating redundant variables and events to small changes like avoiding the initialization of numeric variables and readjusting the order of the variables inside functions. Overall, we were able to save 292167 wei of transaction costs. Here, a more comprehensive plot of the results of the optimization steps that we followed: 
 
-![alt text](https://github.com/FilippoBurresi/FWBD_Tendering/blob/main/gasPlot.jpeg)
+<p align="center">
+  <img width="460" height="300" src="https://github.com/FilippoBurresi/FWBD_Tendering/blob/main/gasPlot.jpeg">
+</p>
+
 
