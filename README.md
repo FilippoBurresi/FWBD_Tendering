@@ -18,18 +18,25 @@ utils.py
 config.py
 SmartContractUserInteraction.py
 ```
-We wanted to create a simple way to interact with the Tendering Smart-Contract especially for the firms willing to participate into a tender and all those citizens interested in investigating the correctness and fairness of the tendering procedure.
-In order to do so, we develop a web3-based python code capable of connecting each address to the range of functions specific to its own role.
-We also built a user-friendly interface based on the above-mentioned code thanks to the tkinter library through which we created a prototype implementation of our model: in this way, you can get an idea of how the Smart Contract works.
-
+We wanted to create a intuitive way to interact with the Tendering Smart-Contract both for the PA in the tender creation process and for the firms willing to participate in a tender and all those citizens interested in investigating the correctness and fairness of the tendering procedure. In order to do so, we develop a web3-based python code capable of connecting each address to the range of functions specific to its own role. We also built a user-friendly interface based on the above-mentioned code thanks to the Tkinter library through which we created a prototype implementation of our model: in this way, you can get an idea of how the Smart Contract works.
+To make this prototype more usable in the testing phase, the possibility to change at will the account with which to interact with the smart contract has been inserted in the login tab in order to see the difference in terms of permissions between the various types of accounts (PA, allowed contractor and citizen)
 In the following sections, we are going to present some examples of how firms and citizens can make use of the Tendering Smart-Contract via python to better show how easily accessible our contract is.
 
+### *PA-Role
+
+From the user interface, the public administration can easily create a tender by entering the details via text inputs. It can also give permission to some accounts to place bids and finally declare the winner once the tendering is closed.
 
 ### *Firm-Role* 
 
-A firm might visualize all the tenders with the `get_tender_status` python function that calls three different functions defined in `Tendering.sol`: ```getTendersLenght, isPending, TenderDetails```.
-At this point, the firm will have an idea of how many tenders have been generated so far and what tenders are still active. Then, according to the one that better suits its offer, the firm will decide where to participate. To send its own proposal to the blockchain, the firm has just to call the `send_bid` python function and to specify the characteristics of its bid.  The three elements of the offer – price, estimated time of realization, environment-friendliness score – will be automatically saved in a txt file and an hashed copy of this file will be then sent to the blockchain by accessing the `placeBid` solidity function.
-Whereas, to conclude a bid, a firm has to call the `send_unencrypted_solidity` python function, directly connected to `concludeBid` solidity Function: the hash of the unencrypted offer will be checked to match the hash sent in the initial phase. 
+A company can view in tabular form from the Notice Board tab all the tenders currently active (this does not require any permission). Then, according to the one that better suits its offer, the firm will decide where to participate. In fact, once the company is authorized by the PA, to send its own proposal to the blockchain, the firm has just to call the SendBid function and to specify the characteristics of its bid. The three elements of the offer – price, estimated time of realization, environment-friendliness score – will be automatically saved in a txt file in the working directory and the hash of the offer will be then sent to the blockchain by calling the placeBid solidity function.  The company will use the txt file by uploading it and then, through the appropriate function, complete the offer. In fact, the smart contract will check whether the hash matches the extended offer before validating it and exposing it to evaluation.
+
 
 All these steps can be performed and visualized by accessing the tkinter interface, choosing an address granted with firm role (1-8) in the first window and then playing within the notice board and the contractor windows.
+
+### *Citizen (every account)*
+
+Any citizen with an account can call all the functions present in the Notice Board tab and that show in tabular form all the active tenders, the tenders already concluded and all the offers related to a specific tender. The goal of this function is to make the operation of the smart contract transparent, giving citizens the opportunity to verify its work.
+
+The previous step can be performed by choosing every account in the in the login tab.
+
 
