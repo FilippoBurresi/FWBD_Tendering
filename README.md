@@ -5,7 +5,7 @@ These are our motivations behind the project. Now, let’s deepen into our imple
 ## **Access Control with PA.sol**
 Access control is crucial on the Blockchain, since we want to control who is allowed to do what in a tendering procedure. According to our approach, tendering procedures can be accessed by three different agents: the public administration that issues a request for tender, a firm that sends a bid, and finally a citizen that wants to access the process and check its fairness. Clearly, each of the agents involved has different powers in terms of accessibility. We implemented the aforementioned structure by following OpenZeppelin’s instructions (https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/AccessControl.sol), and we created a Role-based Access Control system for our smart contract that you can find in PA.sol. 
 
-## **Tendering.sol**
+## **Outlining a public tendering with Tendering.sol**
 The smart contract takes into account all the phases that define a tendering, that are: request for tenders, bidding, evaluation and publishing the results. The pursuit of the subsequent stage is controlled by ad hoc modifiers. 
 1)	In the first phase, a public administration will create a tendering with the analogous function. The request for tenders is a struct that contains all relevant information, that are the name of the public institution, the description of the request, the deadlines – one for submitting the hash of the offer and another one for submitting the explicit offer – and the evaluation weights needed for the evaluation phase (see more later). To avoid fraudulent attacks, we control that only allowed institutions can actually create a tendering. 
 2)	In the second phase, every interested firm can look at the details of the tendering of interest and decide whether to apply or not. If yes, the firm must send a bid as a hash by the first deadline, i.e. ```bidSubmissionClosingDateHash```, with the function ```placeBid```. To reflect as closely as possible reality and to avoid excessive gas costs as well as fraudulent attacks, we decided to limit the number of times a firm can place a bid for a specific tender to only one time. In other words, a firm can participate in more than one tendering procedure but it can send no more than one bid for each tendering. After the first deadline, the firm must finalize its bid by submitting its offer explicitly through the function ```concludeBid```. To avoid bad behaviours, the system checks whether the hash previously sent and the explicit offer match through a require inside concludeBid. If valid, the bid is considered for the evaluation part. 
@@ -41,5 +41,12 @@ All these steps can be performed and visualized by accessing the tkinter interfa
 Any citizen with an account can call all the functions present in the Notice Board tab and that show in tabular form all the active tenders, the tenders already concluded and all the offers related to a specific tender. The goal of this function is to make the operation of the smart contract transparent, giving citizens the opportunity to verify its work.
 
 The previous step can be performed by choosing every account in the in the login tab.
+
+## **Optimization**
+
+The code in Tendering.sol has been optimized so to spend less gas as we can in transactions. This is crucial to make our project appealing to both public administrations and firms. Indeed, our goal is to show how easy, transparent and cheap are Blockchain-based tendering procedures to these two main actors. On the other hand, citizens do not spend any gas in checking the tendering since we took care of expressing those functions as pure/view. 
+
+To optimize the smart contract we combined different adjustments: from eliminating redundant variables and events to small changes like avoiding the initialization of numeric variables and readjusting the order of the variables inside functions. Overall, we were able to save 292167 wei of transaction costs. Here, a more comprehensive plot of the results of the optimization steps that we followed: 
+
 
 
