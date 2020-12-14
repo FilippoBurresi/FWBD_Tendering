@@ -152,38 +152,6 @@ contract TenderingSmartContract is PA {
         c.bids[msg.sender] = BiddingOffer(msg.sender,_hashOffer,false,"","", new string[](0));
     }
     
-    
-    /**
-     * @notice this function is based on the String & slice utility library.
-     * It performs the splitting of a string according to a specified separator
-     * @return the list of strings obtained after the splitting
-     */
-    function SMT(string memory _phrase,string memory _separator ) private pure returns(string[] memory) {
-        strings.slice memory s = _phrase.toSlice();
-        strings.slice memory delim = _separator.toSlice();
-        string[] memory parts = new string[](s.count(delim));
-        for (uint i = 0; i < parts.length; i++) {
-           parts[i] = s.split(delim).toString();
-        }
-
-        return (parts);
-    }
-
-    /**
-     * @notice this function converts a string to an integer type
-     * @return _ret : the initial parameter parsed as uint
-     */
-    function parseInt(string memory _value) private pure returns (uint _ret) {
-        bytes memory _bytesValue = bytes(_value);
-        uint j = 1;
-        for(uint i = _bytesValue.length-1; i >= 0 && i < _bytesValue.length; i--) {
-            assert(uint8(_bytesValue[i]) >= 48 && uint8(_bytesValue[i]) <= 57);
-            _ret += (uint8(_bytesValue[i]) - 48)*j;
-            j*=10;
-        }
-    }
-
-
     /**
      * @notice concludeBid can only be called by an authorized firm to conclude a bid,
      * by sending the unencrypted offer before the second (data) deadline.
@@ -210,7 +178,39 @@ contract TenderingSmartContract is PA {
         c.bids[msg.sender].valid = true;
         _participants[_tenderKey].push(msg.sender); // only firms with valid bids are considered
     }
+    
+    
+    /**
+     * @notice this function is based on the String & slice utility library.
+     * It performs the splitting of a string according to a specified separator
+     * @return the list of strings obtained after the splitting
+     */
+    function SMT(string memory _phrase,string memory _separator ) private pure returns(string[] memory) {
+        strings.slice memory s = _phrase.toSlice();
+        strings.slice memory delim = _separator.toSlice();
+        string[] memory parts = new string[](s.count(delim));
+        for (uint i = 0; i < parts.length; i++) {
+           parts[i] = s.split(delim).toString();
+        }
 
+        return (parts);
+    }
+
+
+    /**
+     * @notice this function converts a string to an integer type
+     * @return _ret : the initial parameter parsed as uint
+     */
+    function parseInt(string memory _value) private pure returns (uint _ret) {
+        bytes memory _bytesValue = bytes(_value);
+        uint j = 1;
+        for(uint i = _bytesValue.length-1; i >= 0 && i < _bytesValue.length; i--) {
+            assert(uint8(_bytesValue[i]) >= 48 && uint8(_bytesValue[i]) <= 57);
+            _ret += (uint8(_bytesValue[i]) - 48)*j;
+            j*=10;
+        }
+    }
+    
 
     /**
      * @notice this function is called by the PA after the tender is closed to
