@@ -11,6 +11,7 @@ import "./PA.sol"; // needed for access control
 /// - the bidding part, where each allowed firm can send a bid in response to a request for tender;
 /// - the evaluation part, where the scores are computed and the winner is assigned; 
 /// - the publishing part, where people can access the results of the tendering in question. 
+
 contract TenderingSmartContract is PA {
 
     using SafeMath for uint;
@@ -51,9 +52,7 @@ contract TenderingSmartContract is PA {
     // needed for the evaluation part
     mapping(uint => address[]) private _participants; // from tender id => list of participants
     mapping(uint => uint[])  private _scores; // from tender id => list of scores
-
-    //mapping(uint => address) private tenderIdToWinner; // from tenderId => address of the winner
-
+    
     /**
      * a modifier to check that an encrypted bid is sent between the bid opening date and the first
      * deadline, i.e. the date by which to send the hash of an offer.
@@ -151,41 +150,8 @@ contract TenderingSmartContract is PA {
         c.AlreadyBid[msg.sender] = true;
         // a new offer is created. All the elements a BiddingOffer type is made of are inserted
         c.bids[msg.sender] = BiddingOffer(msg.sender,_hashOffer,false,"","", new string[](0));
-        //_participants[_tenderKey].push(msg.sender); // moved to concludeBid
     }
     
-    
-    /**
-     * @notice this function is based on the String & slice utility library.
-     * It performs the splitting of a string according to a specified separator
-     * @return the list of strings obtained after the splitting
-     */
-    function SMT(string memory _phrase,string memory _separator ) private pure returns(string[] memory) {
-        strings.slice memory s = _phrase.toSlice();
-        strings.slice memory delim = _separator.toSlice();
-        string[] memory parts = new string[](s.count(delim));
-        for (uint i = 0; i < parts.length; i++) {
-           parts[i] = s.split(delim).toString();
-        }
-
-        return (parts);
-    }
-
-    /**
-     * @notice this function converts a string to an integer type
-     * @return _ret : the initial parameter parsed as uint
-     */
-    function parseInt(string memory _value) private pure returns (uint _ret) {
-        bytes memory _bytesValue = bytes(_value);
-        uint j = 1;
-        for(uint i = _bytesValue.length-1; i >= 0 && i < _bytesValue.length; i--) {
-            assert(uint8(_bytesValue[i]) >= 48 && uint8(_bytesValue[i]) <= 57);
-            _ret += (uint8(_bytesValue[i]) - 48)*j;
-            j*=10;
-        }
-    }
-
-
     /**
      * @notice concludeBid can only be called by an authorized firm to conclude a bid,
      * by sending the unencrypted offer before the second (data) deadline.
@@ -207,12 +173,44 @@ contract TenderingSmartContract is PA {
         Tender storage c = tenders[_tenderKey];
         // finally conclude the bid by submitting the description
         c.bids[msg.sender].description = _description;
-        //memorizing the separator used in each bid
+        // memorizing the separator used in each bid
         c.bids[msg.sender].separator = _separator;
         c.bids[msg.sender].valid = true;
         _participants[_tenderKey].push(msg.sender); // only firms with valid bids are considered
     }
+    
+    
+    /**
+     * @notice this function is based on the String & slice utility library.
+     * It performs the splitting of a string according to a specified separator
+     * @return the list of strings obtained after the splitting
+     */
+    function SMT(string memory _phrase,string memory _separator ) private pure returns(string[] memory) {
+        strings.slice memory s = _phrase.toSlice();
+        strings.slice memory delim = _separator.toSlice();
+        string[] memory parts = new string[](s.count(delim));
+        for (uint i = 0; i < parts.length; i++) {
+           parts[i] = s.split(delim).toString();
+        }
 
+        return (parts);
+    }
+
+
+    /**
+     * @notice this function converts a string to an integer type
+     * @return _ret : the initial parameter parsed as uint
+     */
+    function parseInt(string memory _value) private pure returns (uint _ret) {
+        bytes memory _bytesValue = bytes(_value);
+        uint j = 1;
+        for(uint i = _bytesValue.length-1; i >= 0 && i < _bytesValue.length; i--) {
+            assert(uint8(_bytesValue[i]) >= 48 && uint8(_bytesValue[i]) <= 57);
+            _ret += (uint8(_bytesValue[i]) - 48)*j;
+            j*=10;
+        }
+    }
+    
 
     /**
      * @notice this function is called by the PA after the tender is closed to
@@ -266,7 +264,7 @@ contract TenderingSmartContract is PA {
      * and, before computing the weighted averages, the adjust_measures function is called
      * in order to make the time and the environment_score comparable with the price
      */
-    function compute_scores(uint _tenderKey) public onlyPA afterDeadline(_tenderKey) {
+    function compute_scores(uint _tenderKey) external onlyPA afterDeadline(_tenderKey) {
         require(msg.sender == tenders[_tenderKey].tenderingInstitution);
         // weight associated to price
         uint w1 = tenders[_tenderKey].evaluation_weights[0];
@@ -287,13 +285,11 @@ contract TenderingSmartContract is PA {
                 // e.g. if price=10000 and env=2 then envir_adj = 20000
                 uint price = parseInt(to_store.NewDescription[0]);
                 uint timing = adjust_measures(price, parseInt(to_store.NewDescription[1]));
-                //assert((to_store.NewDescription[2]>0 && to_store.NewDescription[2] <5)); // BUT it reverts ALL the function if false
                 uint environment = adjust_measures(price, parseInt(to_store.NewDescription[2]));
                 uint score = w1.mul(price);
                 score = score.add(w2.mul(timing));
                 score = score.add(w3.mul(environment));
 
-               //_participants[_tenderKey].push(to_store.contractor);
                // all the scores are saved in the _scores mapping
                _scores[_tenderKey].push(score);
                // each bidder address is assigned to its own score
@@ -309,7 +305,7 @@ contract TenderingSmartContract is PA {
      * In case of the same score between two bidders,
      * the firm which sent the bidding first is preferred.
      */
-    function assign_winner(uint _tenderKey) public  onlyPA afterDeadline(_tenderKey) {
+    function assign_winner(uint _tenderKey) external onlyPA afterDeadline(_tenderKey) {
         require(msg.sender == tenders[_tenderKey].tenderingInstitution);
         uint winning_score = _scores[_tenderKey][0];
         uint winning_index;
@@ -323,16 +319,13 @@ contract TenderingSmartContract is PA {
             }
         }
         tenders[_tenderKey].winningContractor = _participants[_tenderKey][winning_index];
-        //tenderIdToWinner[_tenderKey] = _participants[_tenderKey][winning_index];
-        //emit Winner_display("We have a winner!", _tenderKey, _participants[_tenderKey][winning_index], winning_score);
-        //return (_participants[_tenderKey][winning_index], winning_score);
     }
 
     /**
      * @notice displayWinner function can be called by any citizen after the tender is closed.
      * @return the address of the winner and its score.
      */
-    function displayWinner(uint _tenderKey) public view afterDeadline(_tenderKey) returns (address, uint) {
+    function displayWinner(uint _tenderKey) external view afterDeadline(_tenderKey) returns (address, uint) {
         return (tenders[_tenderKey].winningContractor, tenders[_tenderKey].addressToScore[tenders[_tenderKey].winningContractor]);
         /*
         Alternatively, we can simply return tenders[_tenderKey].winningContractor
