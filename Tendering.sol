@@ -267,6 +267,7 @@ contract TenderingSmartContract is PA {
      * in order to make the time and the environment_score comparable with the price
      */
     function compute_scores(uint _tenderKey) public onlyPA afterDeadline(_tenderKey) {
+        require(msg.sender == tenders[_tenderKey].tenderingInstitution);
         // weight associated to price
         uint w1 = tenders[_tenderKey].evaluation_weights[0];
         // weight associated to timing
@@ -309,6 +310,7 @@ contract TenderingSmartContract is PA {
      * the firm which sent the bidding first is preferred.
      */
     function assign_winner(uint _tenderKey) public  onlyPA afterDeadline(_tenderKey) {
+        require(msg.sender == tenders[_tenderKey].tenderingInstitution);
         uint winning_score = _scores[_tenderKey][0];
         uint winning_index;
 
