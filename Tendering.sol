@@ -23,17 +23,17 @@ contract TenderingSmartContract is PA {
     struct BiddingOffer {
         address contractor; // bidder address
         bytes32 hashOffer; // hash of the offer sent
-        bool valid; // a bid becomes valid what the actual offer is verified to coincide with the hash sent
-        string description; //each bid has to indicate the price, time of realization and environment friendliness (expressed with a score that goes from 1 to 4)
-        string separator; //each offer is a string where the 3 aforementioned elements are separated by a random separator
-        string[] NewDescription; //the offer written without separator: a list of the 3 elements(prince,time,environment)
+        bool valid; // a bid becomes valid when the actual offer is verified to coincide with the hash sent
+        string description; // each bid has to indicate the price, time of realization and environment friendliness (expressed with a score that goes from 1 (highest) to 4 (lowest))
+        string separator; // each offer is a string where the 3 aforementioned elements are separated by a random separator
+        string[] NewDescription; // the offer written without separator: a list of the 3 elements([prince,time,environment])
     }
 
     struct Tender {
         uint256 tender_id;
         uint256 bidOpeningDate; // date from which hashes can be sent
-        uint256 bidSubmissionClosingDateData; // date by which to sent the unencrypted bid
-        uint256 bidSubmissionClosingDateHash; // date by which to sent the hash
+        uint256 bidSubmissionClosingDateData; // date by which to send the unencrypted bid
+        uint256 bidSubmissionClosingDateHash; // date by which to send the hash
         uint[] evaluation_weights; // array of lenght=3 that stores the weights used for evaluation, i.e. weighted average
         mapping(address => BiddingOffer) bids; // from bidding address to its bidding offer
         mapping(address => uint) addressToScore; // from bidding address to its score
@@ -44,9 +44,9 @@ contract TenderingSmartContract is PA {
         string description; // tender description
     }
 
-    uint[] private tenderList; //list of tender keys so we can enumarate them
-    uint private tenderKeys; //lenght of tenderList
-    mapping (uint => Tender) private tenders; //from tender_id to the tender characteristics
+    uint[] private tenderList; // list of tender keys so we can enumarate them
+    uint private tenderKeys; // lenght of tenderList
+    mapping (uint => Tender) private tenders; // from tender_id to the tender characteristics
 
     // needed for the evaluation part
     mapping(uint => address[]) private _participants; // from tender id => list of participants
@@ -56,7 +56,7 @@ contract TenderingSmartContract is PA {
 
     /**
      * a modifier to check that an encrypted bid is sent between the bid opening date and the first
-     * deadline, i.e. the date by which to sent the hash of an offer.
+     * deadline, i.e. the date by which to send the hash of an offer.
      */
     modifier inTimeHash (uint256 _tenderKey) {
         require(
@@ -67,7 +67,7 @@ contract TenderingSmartContract is PA {
     }
 
     /**
-     * a modifier to ensure that each bidder can partecipate into a speficic tender
+     * a modifier to ensure that each bidder can partecipate into a specific tender
      * only once.
      */
     modifier AlreadyPlacedBid(uint256 _tenderKey) {
@@ -106,6 +106,7 @@ contract TenderingSmartContract is PA {
      * For simplicity, we are going to express them as seconds.
      * @param w1, w2, w3 are the weights - to be assigned to price, time, environment -
      * that will be used to evaluate the scores.
+     * Note: they are expressed as int (not as float)
      *
      * Requirements:
      * - the sum of the weights has to = 100
@@ -193,7 +194,7 @@ contract TenderingSmartContract is PA {
      * @param _separator indicates the separator that arises between these three elements.
      *
      * Requirements:
-     * - the firm concluding the Bid has to match the firm that has placed that Bid
+     * - the firm concluding the Bid has to match the firm that has placed that Bid.
      * - The hash sent at the beginning has to match the hash of the unencrypted bid.
      */
     function concludeBid(uint256 _tenderKey, string calldata _description, string calldata _separator) external onlyFirm inTimeData(_tenderKey) {
@@ -237,15 +238,13 @@ contract TenderingSmartContract is PA {
      * The reason lies on the fact that the price is probably expressed on the scale of thousands,
      * while the time on that of tens/hundreds and the environment score is just a number between
      * 1 and 4 (where 1 = highest attention to the environment).
-     * Without any arrangment, a small change in the price will always predominate even in the case
+     * Without any arrangement, a small change in the price will always predominate even in the case
      * of a very small weight assigned to this variable.
      * Therefore, adjusting the measures is fundamental to make things fair and to
      * make each variable as important as the related weight requires.
      * @param _thingToLook is the variable of reference
      * according to which rescaling the other variable (in our case the price)
      * @param _thingToAdjust is the variable whose scale of size needs to be changed
-     *
-     *
      */
     function adjust_measures(uint _thingToLook, uint _thingToAdjust) private pure returns(uint) {
 
@@ -262,8 +261,8 @@ contract TenderingSmartContract is PA {
     /**
      * @notice compute_scores function is called by the PA after the tender is closed to evaluate
      * all the offers.
-     * In the evaluation phase the weights chosen at the beginning are used
-     * and before computing the weighted averages, the adjust_measures function is called
+     * In the evaluation phase, the weights chosen at the beginning are used
+     * and, before computing the weighted averages, the adjust_measures function is called
      * in order to make the time and the environment_score comparable with the price
      */
     function compute_scores(uint _tenderKey) public onlyPA afterDeadline(_tenderKey) {
