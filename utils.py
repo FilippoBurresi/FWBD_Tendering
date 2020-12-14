@@ -84,7 +84,7 @@ def allowed_companies_ids(web3,contract,input_dict):
        list_allowed=input_dict["allowed companies"].get().split(",")
        for i in list_allowed:
            contract.functions.addFirm(web3.eth.accounts[int(i)]).transact()
-           messagebox.showinfo("Allowed Companies", "The companies have been added to the allowed list")
+       messagebox.showinfo("Allowed Companies", "The companies have been added to the allowed list")
    except Exception as e:
        messagebox.showerror("Allowed Companies", str(e)+ " You might not have the permission to call this function")
 		
@@ -124,12 +124,10 @@ def get_tenders_status(web3,contract):
         list=contract.functions.see_TenderDetails(i).call()
         list.append(status)
         l.append(list)	
-   df=pd.DataFrame(l,columns=["tender id","name","description","weights","bid list","winning contractor","pending?"])
+   df=pd.DataFrame(l,columns=["tender id","name","description","weights","number participants","winning contractor","pending?"])
    df["price weight"]=df["weights"].apply(lambda x: x[0])
    df["time weight"]=df["weights"].apply(lambda x: x[1])
    df["environment weight"]=df["weights"].apply(lambda x: x[2])
-   dict_address={address:web3.eth.accounts.index(address) for address in web3.eth.accounts}
-   df["bid list"]=df["bid list"].apply(lambda x: " ".join([str(dict_address[i]) for i in x]))
    df.drop('weights', inplace=True, axis=1)
    return df
   
@@ -153,7 +151,8 @@ def see_active_tenders(web3,contract, input_dict):
         df = df[df["pending?"]==True]
         df.drop('pending?', inplace=True, axis=1)
         df.drop('winning contractor', inplace=True, axis=1)
-        		#from here the code "print" the dataframe
+        df.drop("number participants", inplace=True, axis=1)
+        #from here the code "print" the dataframe
         input_dict['tv1']["column"] = list(df.columns)
         for column in input_dict['tv1']["column"]:
             input_dict['tv1'].column(column,minwidth=0, width=78, stretch=NO)
@@ -187,10 +186,12 @@ def see_closed_tenders(web3,contract, input_dict):
         df=get_tenders_status(web3,contract)
         df = df[df["pending?"]==False]
         df.drop('pending?', inplace=True, axis=1)
-        		#from here the code "print" the dataframe
+        dict_address = {address: web3.eth.accounts.index(address) for address in web3.eth.accounts}
+        df["winning contractor"] = df["winning contractor"].apply(lambda x: dict_address.get(x,""))
+        #from here the code "print" the dataframe
         input_dict['tv1']["column"] = list(df.columns)
         for column in input_dict['tv1']["column"]:
-            input_dict['tv1'].column(column,minwidth=0, width=78, stretch=NO)
+            input_dict['tv1'].column(column,minwidth=0, width=67, stretch=NO)
         input_dict['tv1']["show"] = "headings"
         for column in input_dict['tv1']["columns"]:
             input_dict['tv1'].heading(column, text=column) # let the column heading = column name
@@ -278,18 +279,18 @@ def send_bid(web3,contract, input_dict):
         envir=input_dict["environment"].get()
         if int(envir) not in [1,2,3,4]:
             messagebox.showerror("Error", "the variable environment has to be 1,2,3,4")
-        
-        list_values_to_hash=[price,time,envir]
-        unencrypted_message,separator=to_string_and_sep(list_values_to_hash)
-        hash=encrypt(unencrypted_message)
-        
-        send_bid_solidity(web3,contract,tender_id,hash)
-        save_txt(web3,str(web3.eth.defaultAccount),str(separator),unencrypted_message,str(tender_id))
-        messagebox.showinfo("Send bid", "The bid has been sent successfully")
+        else:
+            list_values_to_hash=[price,time,envir]
+            unencrypted_message,separator=to_string_and_sep(list_values_to_hash)
+            hash=encrypt(unencrypted_message)
+
+            send_bid_solidity(web3,contract,tender_id,hash)
+            save_txt(web3,str(web3.eth.defaultAccount),str(separator),unencrypted_message,str(tender_id))
+            messagebox.showinfo("Send bid", "The bid has been sent successfully")
    except Exception as e:
         messagebox.showerror("Allowed Companies", str(e))
     
-def send_unencrypted(web3,contract, input_dict,filename):
+def send_unencrypted(web3,contract, input_dict):
    """
    sends the unencrypted bid
    
@@ -303,6 +304,7 @@ def send_unencrypted(web3,contract, input_dict,filename):
    --------------
    sends to ethereum the un-encrypted offer
    """
+   filename=input_dict["link"]["text"]
    try:
        tender_id,unencrypted_message,separator=load_txt(filename)
        send_unencrypted_solidity(web3,contract,tender_id,unencrypted_message,separator)

@@ -12,6 +12,7 @@ def makeform(root, fields, title="Lorem Ipsum", description="Lorem Ipsum descrip
     def fileDialog(v):
         filename = filedialog.askopenfilename(initialdir ="/", title = "Select a file") #, filetype = (('text files', 'txt'),)
         v.set(filename)
+
     entries = {}
     row = Frame(root)
     row.pack(fill = X, padx = 5, pady = 5)
@@ -54,6 +55,7 @@ def makeform(root, fields, title="Lorem Ipsum", description="Lorem Ipsum descrip
         row = Frame(root)
         v = StringVar()
         lab = Label(row, textvariable = v)
+        entries["link"]=lab
         btn = Button(row, text = "File", height=2, width=12, command = lambda arg1=v : fileDialog(arg1))
         row.pack(side=TOP, fill=X, expand = True)
         btn.pack(side= LEFT,padx = 5 , pady = 5)
@@ -187,8 +189,7 @@ def main_loop(web3,contract,function_info):
     conclude_bid_fields = ()
     elem_3 = makeform(second_frame_contractor, conclude_bid_fields, title=title, description=function_info[title],file= True)
     btn_3 = elem_3['btn']
-    elem_x="to_define"
-    btn_3['command'] = lambda arg1=web3, arg2= contract, arg3 = elem_3, arg4=elem_x: send_unencrypted(arg1, arg2, arg3,arg4)
+    btn_3['command'] = lambda arg1=web3, arg2= contract, arg3 = elem_3: send_unencrypted(arg1, arg2, arg3)
     
     # #getTenderStatus
     # title = 'getTenderStatus'
