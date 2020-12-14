@@ -2,6 +2,19 @@ pragma solidity >0.4.13 <0.7.0;
 
 import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/AccessControl.sol";
 
+/**
+ * With the following contract we create two different 'characters'
+ * that we are going to exploit in the TenderingSmart Contract (see Tendering.sol).
+ * The two actors are:
+ * - the Public Administration: the address which deploys the TenderingSmart Contract will be authomatically granted with the PA role,
+ * hence it will be able to call all those functions with the onlyPA modifier.
+ * It will also be in charged of deciding which firms can partecipate into the tender with the addFirm function,
+ * and additionally it could allow any other user to play the PA role.
+ * (Note : ALl those users added as PA or firm can - at any time - renounce the assigned role.)
+ * - The firm : an address granted with the firm-role is able to take part into a tender as bidder and, thus, it can
+ * call all those functions in the TenderingSmart Contract with the OnlyFirm modifier.
+ */
+
 contract PA is AccessControl {
 
     bytes32 public constant FIRM_ROLE = keccak256("FIRM_ROLE");
