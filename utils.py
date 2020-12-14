@@ -10,31 +10,58 @@ filename = "/"
 
 
 def initialize_contract(ganache_URL,address,abi):
-    web3=Web3(Web3.HTTPProvider(ganache_URL))
+   """
+   inizialitization of the contract and connection ethereum-ganache-python
+   with web3
+   
+   Parameters
+   --------------
+   ganache_URL : the string of the ganache URL
+   address: the string of the contract address
+   abi: the contract ABI in string
+   
+   Returns
+   --------------
+   the objects web3 and contract for the interaction
+   """
+   web3=Web3(Web3.HTTPProvider(ganache_URL))
 
-    web3.eth.defaultAccount=web3.eth.accounts[0]
-    abi=json.loads(abi)
-    address=web3.toChecksumAddress(address)
-    contract=web3.eth.contract(address=address,abi=abi)
-    return web3,contract
+   web3.eth.defaultAccount=web3.eth.accounts[0]
+   abi=json.loads(abi)
+   address=web3.toChecksumAddress(address)
+   contract=web3.eth.contract(address=address,abi=abi)
+   return web3,contract
 
 
 def create_tender(web3,contract,input_dict_pa):
-	try:
-		###input_dict_pa={"tender_name":"ponte di messina","description":"blablabla","n_days1":"1";"n_days2":"2","weight_price":"0.3"
-		#,"weight_time":"0.1","weight_environment":0.6}
-		tender_name=input_dict_pa["tender name"].get()
-		description=input_dict_pa["description"].get()
-		n_days_1=int(input_dict_pa["n seconds to send hash"].get())
-		n_days_2=int(input_dict_pa["n seconds to send file"].get())
-		weight_1_price=int(input_dict_pa["weight price"].get())
-		weight_2_time=int(input_dict_pa["weight time"].get())
-		weight_3_envir=int(input_dict_pa["weight environment"].get())
-		create_tender_solidity(web3,contract,tender_name,description,n_days_2,n_days_1,weight_1_price,weight_2_time,weight_3_envir)
-		messagebox.showinfo("Create Tender", "the function has been called successfully")
+   """
+   the PA creates a new tender on the blockchain
+   
+   Parameters
+   --------------
+   web3 object
+   contract object
+   input_dict_pa, the input dictionary with the values needed for the tender
+       creation (tender name, description, number of seconds to send hash,
+       number of seconds to send data, the weights - price, time, environment)
+   
+   Returns
+   --------------
+   Nothing, it creates on the blockchain a new tender, error message may appear
+   """
+   try:
+       tender_name=input_dict_pa["tender name"].get()
+       description=input_dict_pa["description"].get()
+       n_days_1=int(input_dict_pa["n seconds to send hash"].get())
+       n_days_2=int(input_dict_pa["n seconds to send file"].get())
+       weight_1_price=int(input_dict_pa["weight price"].get())
+       weight_2_time=int(input_dict_pa["weight time"].get())
+       weight_3_envir=int(input_dict_pa["weight environment"].get())
+       create_tender_solidity(web3,contract,tender_name,description,n_days_2,n_days_1,weight_1_price,weight_2_time,weight_3_envir)
+       messagebox.showinfo("Create Tender", "the function has been called successfully")
 	
-	except Exception as e:
-		messagebox.showerror("Create Tender", str(e) + " You might not have the permission to call this function")
+   except Exception as e:
+       messagebox.showerror("Create Tender", str(e) + " You might not have the permission to call this function")
 
 
     
@@ -42,14 +69,27 @@ def create_tender_solidity(web3,contract,tender_name,description,n_days_1,n_days
     contract.functions.CreateTender(tender_name,description,n_days_1,n_days_2,weight_1_price,weight_2_time,weight_3_envir).transact()
  
 def allowed_companies_ids(web3,contract,input_dict):
-	try:
-		list_allowed=input_dict["allowed companies"].get().split(",")
-		for i in list_allowed:
-			contract.functions.addFirm(web3.eth.accounts[int(i)]).transact()
-			print(web3.eth.accounts[int(i)])
-		messagebox.showinfo("Allowed Companies", "The companies have been added to the allowed list")
-	except Exception as e:
-		messagebox.showerror("Allowed Companies", str(e)+ " You might not have the permission to call this function")
+   """
+   the PA gives permissions for creating BIDS
+   
+   Parameters
+   --------------
+   web3 object
+   contract object
+   input_dict, dictionary from tkinter with key allowed companies, a string 
+       with comma separated ids
+   
+   Returns
+   --------------
+   Nothing, it creates on the blockchain the permissions, error message may appear
+   """
+   try:
+       list_allowed=input_dict["allowed companies"].get().split(",")
+       for i in list_allowed:
+           contract.functions.addFirm(web3.eth.accounts[int(i)]).transact()
+           messagebox.showinfo("Allowed Companies", "The companies have been added to the allowed list")
+   except Exception as e:
+       messagebox.showerror("Allowed Companies", str(e)+ " You might not have the permission to call this function")
 		
 
 def assign_winner(web3,contract,input_dict):
@@ -67,29 +107,52 @@ def assign_winner(web3,contract,input_dict):
 
 
 
-##### CITIZEN INTERFACE
-def get_tenders_status(web3,contract, input_dict):
-    num_tenders=contract.functions.getTendersLength().call()
-    l=[]
-    for i in range(num_tenders):
+def get_tenders_status(web3,contract):
+   """
+   creates a dataframe with the tenders, active and closed
+   
+   Parameters
+   --------------
+   web3 object
+   contract object
+   
+   Returns
+   --------------
+   the dataframe with the infos
+   """
+   num_tenders=contract.functions.getTendersLength().call()
+   l=[]
+   for i in range(num_tenders):
         key,status=contract.functions.isPending(i).call()
         list=contract.functions.see_TenderDetails(i).call()
         list.append(status)
         l.append(list)	
-    df=pd.DataFrame(l,columns=["tender id","name","description","weights","bid list","winning contractor","pending?"])
-    print(df["weights"][0])
-    df["price weight"]=df["weights"].apply(lambda x: x[0])
-    df["time weight"]=df["weights"].apply(lambda x: x[1])
-    df["environment weight"]=df["weights"].apply(lambda x: x[2])
-    dict_address={address:web3.eth.accounts.index(address) for address in web3.eth.accounts}
-    df["bid list"]=df["bid list"].apply(lambda x: " ".join([str(dict_address[i]) for i in x]))
-    df.drop('weights', inplace=True, axis=1)
-    return df
+   df=pd.DataFrame(l,columns=["tender id","name","description","weights","bid list","winning contractor","pending?"])
+   df["price weight"]=df["weights"].apply(lambda x: x[0])
+   df["time weight"]=df["weights"].apply(lambda x: x[1])
+   df["environment weight"]=df["weights"].apply(lambda x: x[2])
+   dict_address={address:web3.eth.accounts.index(address) for address in web3.eth.accounts}
+   df["bid list"]=df["bid list"].apply(lambda x: " ".join([str(dict_address[i]) for i in x]))
+   df.drop('weights', inplace=True, axis=1)
+   return df
   
 def see_active_tenders(web3,contract, input_dict):
-    try:
+   """
+   creates a dataframe with the active tenders
+   
+   Parameters
+   --------------
+   web3 object
+   contract object
+   input_dict, dictionary with the previous dataframe (tkinter object)
+   
+   Returns
+   --------------
+   shows in the interface the dataframe with the infos
+   """
+   try:
         input_dict['tv1'].delete(*input_dict['tv1'].get_children()) 
-        df=get_tenders_status(web3,contract,input_dict)
+        df=get_tenders_status(web3,contract)
         df = df[df["pending?"]==True]
         df.drop('pending?', inplace=True, axis=1)
         df.drop('winning contractor', inplace=True, axis=1)
@@ -104,12 +167,25 @@ def see_active_tenders(web3,contract, input_dict):
         df_rows = df.to_numpy().tolist() # turns the dataframe into a list of lists
         for row in df_rows:
             input_dict['tv1'].insert("", "end", values=row)
-    except Exception as e:
+   except Exception as e:
         messagebox.showerror("Allowed Companies", str(e))
 
     
 def see_closed_tenders(web3,contract, input_dict):
-    try:
+   """
+   creates a dataframe with the closed tenders
+   
+   Parameters
+   --------------
+   web3 object
+   contract object
+   input_dict, dictionary with the previous dataframe (tkinter object)
+   
+   Returns
+   --------------
+   shows in the interface the dataframe with the infos
+   """
+   try:
         input_dict['tv1'].delete(*input_dict['tv1'].get_children()) 
         df=get_tenders_status(web3,contract,input_dict)
         df = df[df["pending?"]==False]
@@ -125,15 +201,27 @@ def see_closed_tenders(web3,contract, input_dict):
         df_rows = df.to_numpy().tolist() # turns the dataframe into a list of lists
         for row in df_rows:
             input_dict['tv1'].insert("", "end", values=row)
-    except Exception as e:
+   except Exception as e:
         messagebox.showerror("Allowed Companies", str(e))
 
 
 
 def get_bids_details(web3,contract,input_dict):
-	#### io clicco sul df delle closed tenders su una riga 
-	#e vado su questa nuova view: fattibile?come prendo input?
-    try:
+   """
+   creates a dataframe with the bids of a closed tender
+   
+   Parameters
+   --------------
+   web3 object
+   contract object
+   input_dict, dictionary with the previous dataframe (tkinter object) 
+       and the tender id
+   
+   Returns
+   --------------
+   shows the dataframe with the infos
+   """
+   try:
         input_dict['tv1'].delete(*input_dict['tv1'].get_children()) 
         tender_id = int(input_dict['tender id'].get())
         num_bids=contract.functions.getResultsLenght(tender_id).call()
@@ -160,7 +248,7 @@ def get_bids_details(web3,contract,input_dict):
         df_rows = df.to_numpy().tolist() # turns the dataframe into a list of lists
         for row in df_rows:
             input_dict['tv1'].insert("", "end", values=row)
-    except Exception as e:
+   except Exception as e:
         messagebox.showerror("Allowed Companies", str(e))
 
 
@@ -171,8 +259,22 @@ def get_bids_details(web3,contract,input_dict):
 #### COMPANIES INTERFACE
 
 def send_bid(web3,contract, input_dict):
-    try:
-        		#inputdict={"user_id":"1","tender_id":"11","price":"38448","time":"120","envir":"4"}
+   """
+   sends the encrypted bid
+   
+   Parameters
+   --------------
+   web3 object
+   contract object
+   input_dict, dictionary with the values of the offer (tkinter object):
+       tender id, price, time, environment (1-4)
+   
+   Returns
+   --------------
+   sends to ethereum the hash of the offer and creates a txt with the file
+       to be submitted afterwards
+   """
+   try:
         tender_id=int(input_dict["tender id"].get())
         price=input_dict["price"].get()
         time=input_dict["time"].get()
@@ -187,26 +289,47 @@ def send_bid(web3,contract, input_dict):
         send_bid_solidity(web3,contract,tender_id,hash)
         save_txt(web3,str(web3.eth.defaultAccount),str(separator),unencrypted_message,str(tender_id))
         messagebox.showinfo("Send bid", "The bid has been sent successfully")
-    except Exception as e:
+   except Exception as e:
         messagebox.showerror("Allowed Companies", str(e))
     
 def send_unencrypted(web3,contract, input_dict):
-	try:
-		##come funziona qua per l'input con il txt?
-		tender_id,unencrypted_message,separator=load_txt()
-		send_unencrypted_solidity(web3,contract,tender_id,unencrypted_message,separator)
-		messagebox.showinfo("Bid Completed", "The unencripted bid has been sent")
-	except Exception as e:
-		messagebox.showerror("Allowed Companies", str(e))
+   """
+   sends the unencrypted bid
+   
+   Parameters
+   --------------
+   web3 object
+   contract object
+   input_dict, dictionary (tkinter object) with the input file to send:
+   
+   Returns
+   --------------
+   sends to ethereum the un-encrypted offer
+   """
+   try:
+       tender_id,unencrypted_message,separator=load_txt()
+       send_unencrypted_solidity(web3,contract,tender_id,unencrypted_message,separator)
+       messagebox.showinfo("Bid Completed", "The unencripted bid has been sent")
+   except Exception as e:
+       messagebox.showerror("Allowed Companies", str(e))
 
 
 
 def to_string_and_sep(l):
-    #"12" "12484" "è un bel progetto, si lo è"
-    #s="1212484è un bel progetto"
-    #unencripted_message="12#######12848######è UN BEL PROGETTO SI LO è"
-    s="".join(l)
-    while True:
+   """
+   convert a list of strings into a string separated with a random separator   
+   Parameters
+   --------------
+   list: target list
+   ex. ["hi","I","am"]
+   
+   Returns
+   --------------
+   the string with the separator and the separator
+   ex. "hi##I##am", "##"
+   """
+   s="".join(l)
+   while True:
         separator=get_random_separator()
         if separator not in s:
             unencrypted_message=separator.join(l)+separator
@@ -214,35 +337,97 @@ def to_string_and_sep(l):
             return unencrypted_message,separator
 
 def get_random_separator(length=10):
-    allowed_characters = string.ascii_letters + string.digits + string.punctuation
-    separator = ''.join(random.choice(allowed_characters) for i in range(length))
-    return separator
+   """
+   returns a random separator
+   --------------
+   length: how many characters the separator should have
+   
+   Returns
+   --------------
+   the separator
+   """
+   allowed_characters = string.ascii_letters + string.digits + string.punctuation
+   separator = ''.join(random.choice(allowed_characters) for i in range(length))
+   return separator
 
 def encrypt(unencrypted_message):
-    hash=bytes(Web3.soliditySha3(['string[]'], [unencrypted_message]))
-    print(hash)
-    return hash
+   """
+   encrypts a message using solidity SHA3
+   --------------
+   unencrypted_message: Message to encrypt
+   
+   Returns
+   --------------
+   the hash
+   """
+   hash=bytes(Web3.soliditySha3(['string[]'], [unencrypted_message]))
+   return hash
 
 def send_bid_solidity(web3,contract,tender_id,hash):
-    contract.functions.placeBid(int(tender_id),hash).transact()
+   """
+   sends the bid hash to ethereum
+   --------------
+   web3 object
+   contract object
+   tender_id
+   hash to send
+
+   
+   Returns
+   --------------
+   nothing, executes the solidity function
+   """
+   contract.functions.placeBid(int(tender_id),hash).transact()
 
 def save_txt(web3,user_id,separator,unencrypted_message,tender_id):
-    dict_address={address:web3.eth.accounts.index(address) for address in web3.eth.accounts}
-    file=open("offer_{}.txt".format(dict_address[user_id]),"w")
-    file.writelines([separator+"\n",unencrypted_message+"\n",tender_id])
-    file.close()
+   """
+   creates the txt to send afterwards
+   --------------
+   web3 object
+   contract object
+   tender_id
+   unencrypted_message the message with the separator
+   separator the separator used
+   
+   Returns
+   --------------
+   nothing, creates the file
+   """
+   dict_address={address:web3.eth.accounts.index(address) for address in web3.eth.accounts}
+   file=open("offer_{}.txt".format(dict_address[user_id]),"w")
+   file.writelines([separator+"\n",unencrypted_message+"\n",tender_id])
+   file.close()
     
 def load_txt():
-	global filename
-	print(filename)
-	file=open(filename,"r")
-	
-	separator,unencrypted_message,tender_id=[i.replace("\n","") for i in file.readlines()]
-	file.close()
-	print(separator,unencrypted_message,tender_id)
-	return tender_id,unencrypted_message,separator
+   """
+   load the txt to send
+   --------------
+   Returns
+   --------------
+   nothing, loads the file
+   """
+    global filename
+    file=open(filename,"r")
+    separator,unencrypted_message,tender_id=[i.replace("\n","") for i in file.readlines()]
+    file.close()
+    return tender_id,unencrypted_message,separator
+
 
 def send_unencrypted_solidity(web3,contract,tender_id, unencrypted_message,separator):
+   """
+   sends the unencrypted bid to ethereum
+   --------------
+   web3 object
+   contract object
+   tender_id
+   unencrypted_message
+   separator used
+   
+   
+   Returns
+   --------------
+   nothing, executes the solidity function
+   """
     contract.functions.concludeBid(int(tender_id),unencrypted_message,separator).transact()
     
 
