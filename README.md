@@ -48,5 +48,5 @@ The code in Tendering.sol has been optimized so to spend less gas as we can in t
 
 To optimize the smart contract we combined different adjustments: from eliminating redundant variables and events to small changes like avoiding the initialization of numeric variables and readjusting the order of the variables inside functions. Overall, we were able to save 292167 wei of transaction costs. Here, a more comprehensive plot of the results of the optimization steps that we followed: 
 
-
+![alt text](https://github.com/FilippoBurresi/FWBD_Tendering/blob/main/gasPlot.jpeg)
 
