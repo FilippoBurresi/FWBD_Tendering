@@ -6,9 +6,6 @@ import string
 import random
 import json
 
-filename = "/"
-
-
 def initialize_contract(ganache_URL,address,abi):
    """
    inizialitization of the contract and connection ethereum-ganache-python
@@ -187,7 +184,7 @@ def see_closed_tenders(web3,contract, input_dict):
    """
    try:
         input_dict['tv1'].delete(*input_dict['tv1'].get_children()) 
-        df=get_tenders_status(web3,contract,input_dict)
+        df=get_tenders_status(web3,contract)
         df = df[df["pending?"]==False]
         df.drop('pending?', inplace=True, axis=1)
         		#from here the code "print" the dataframe
@@ -292,7 +289,7 @@ def send_bid(web3,contract, input_dict):
    except Exception as e:
         messagebox.showerror("Allowed Companies", str(e))
     
-def send_unencrypted(web3,contract, input_dict):
+def send_unencrypted(web3,contract, input_dict,filename):
    """
    sends the unencrypted bid
    
@@ -307,7 +304,7 @@ def send_unencrypted(web3,contract, input_dict):
    sends to ethereum the un-encrypted offer
    """
    try:
-       tender_id,unencrypted_message,separator=load_txt()
+       tender_id,unencrypted_message,separator=load_txt(filename)
        send_unencrypted_solidity(web3,contract,tender_id,unencrypted_message,separator)
        messagebox.showinfo("Bid Completed", "The unencripted bid has been sent")
    except Exception as e:
@@ -398,7 +395,7 @@ def save_txt(web3,user_id,separator,unencrypted_message,tender_id):
    file.writelines([separator+"\n",unencrypted_message+"\n",tender_id])
    file.close()
     
-def load_txt():
+def load_txt(filename):
    """
    load the txt to send
    --------------
@@ -406,7 +403,6 @@ def load_txt():
    --------------
    nothing, loads the file
    """
-   global filename
    file=open(filename,"r")
    separator,unencrypted_message,tender_id=[i.replace("\n","") for i in file.readlines()]
    file.close()
