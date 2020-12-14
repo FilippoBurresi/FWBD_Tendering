@@ -1,18 +1,11 @@
-# FWBD_Tendering
-Blockchain for public tendering  
+This project is part of the Finance with Big Data course at Bocconi University. In this repository, we develop a Solidity-based smart contract focused on tendering procedures. We believe Blockchain technology has the potential to disrupt the procurement field, that is the process of researching and exchanging goods and services often done by tendering procedures. Indeed, by transforming the tendering as a smart contract we would be able to improve the procurement by reducing the duration of a tendering – which is very costly – and the possibility of corruption that might happen. In turns, this would improve the welfare of the economy as well as our society. 
+These are our motivations behind the project. Now, let’s deepen into our implementation. 
 
-The project deals with two parts: 
+*** Access Control with PA.sol ***
+Access control is crucial on the Blockchain, since we want to control who is allowed to do what in a tendering procedure. According to our approach, tendering procedures can be accessed by three different agents: the public administration that issues a request for tender, a firm that sends a bid, and finally a citizen that wants to access the process and check its fairness. Clearly, each of the agents involved has different powers in terms of accessibility. We implemented the aforementioned structure by following OpenZeppelin’s instructions (https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/AccessControl.sol), and we created a Role-based Access Control system for our smart contract that you can find in PA.sol. 
 
-(1) **the bidding part**, namely the phase of the tendering procedure when the firm creates a bidding and send that bid to the public sector. In this phase, we structured the project as following: 
+*** Tendering.sol ***
+The smart contract takes into account all the phases that define a tendering, that are: request for tenders, bidding, evaluation and publishing the results. 
+1)	In the first phase, a public administration will create a tendering with the analogous function. The request for tenders is a struct that contains all relevant information, that are the deadlines – one for submitting the hash of the offer and another one for submitting the explicit offer – the description of the request and the evaluation weights needed for the evaluation phase (see more later). To avoid fraudulent attacks, we control that only allowed institutions can actually create a tendering. 
+2)	In the second phase, every interested firm can look at the details of the tendering of interest and decide whether to apply or not. If yes, the firm must send a bid as a hash by the first deadline, i.e. bidSubmissionClosingDateHash. To reflect as closely as possible reality and to avoid excessive gas costs as well as fraudulent attacks, we decided to limit the number of times a firm can place a bid for a specific tender to only one time. In other words, a firm can participate in more than one tendering procedure but it can send no more than one bid for each tendering. After the first deadline, the firm must finalize its bid by submitting its offer explicitly through the function concludeBid. To avoid bad behaviours, the system checks whether the hash previously sent and the explicit offer match through a require inside concludeBid. If valid, the bid is considered for the evaluation part. 
 
-- a *contractFactory* contract that contains the code for what is a contract (i.e. it's a struct with several elements such as contractorAddress, governementAddress, tenderId, status ....) and the code for its creation. Whenever a contract is created, it is pushed in memory inside the array of contracts - which have status = "Pending" - and the event NewContract is triggered. Hence, every node on the blockchain is notified that a new contract for the tendering has been created, but they only see the contract_id, the governement_Address and the tenderId. Therefore, companies can get a sense of how competitive the tendering procedure is without knowing the firms that have created a contract. 
-
-- *contractcreation* instead deals with sending the bidding to the PA. It inherits from the contractfactory, hence it can create the contract with the same function in contractfactory. Plus, it has the function biddingContract that allows the firm to send its bidding to the PA, conditional on the fact that its status = "Complete". We add the variable status in order to take into account sending incomplete biddings, with missing documents. Indeed, before launching the bidding, the modifier onlyCompleted is run. 
-
-**OPEN ISSUES**
-. understand the hash 
-. how to retrieve contract's info, e.g. status, tenderId, etc, if we hash its content
-. write the modifier
-. security check
-
-(2) the PA part: not considered here
