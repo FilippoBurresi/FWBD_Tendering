@@ -8,74 +8,75 @@ filename = "/"
 
 # User interface
 def makeform(root, fields, title="Lorem Ipsum", description="Lorem Ipsum description",view = False, file = False):
-	def fileDialog(v):
-		global filename
-		filename = filedialog.askopenfilename(initialdir ="/", title = "Select a file") #, filetype = (('text files', 'txt'),)
-		v.set(filename)
-	global filename
-	entries = {}
-	row = Frame(root)
-	row.pack(fill = X, padx = 5, pady = 5)
-	lab = Label(row, text = title,font=(None, 15) ,)
-	lab.pack(side=LEFT)
-	row = Frame(root)
-	row.pack(fill = X, padx = 5, pady = 5)
-	lab = Label(row, text = description,font=(None, 10), wraplength = 580, justify = LEFT )
-	lab.pack(side=LEFT)
-	for field in fields:
-		row = Frame(root)
-		lab = Label(row, width=22, text=field+": ", anchor='w')
-		ent = Entry(row, width=40)
-		ent.insert(0,"0")
-		row.pack(side = TOP, fill = X, padx = 5 , pady = 5)
-		lab.pack(side = LEFT,fill = X, padx = 10 , pady = 0)
-		ent.pack(side = RIGHT, expand = YES, fill = X)
-		entries[field] = ent
-	if view:
-		#row = LabelFrame(root, text="Data", height=250, width=600)
-		sub_row1 = Frame(root)
-		sub_row2 = Frame(root)
-		tv1 = ttk.Treeview(sub_row1)   
-		treescrolly = Scrollbar(sub_row1, orient="vertical", command=tv1.yview) 
-		treescrollx = Scrollbar(sub_row2, orient="horizontal", command=tv1.xview) 
-		tv1.configure(xscrollcommand=treescrollx.set, yscrollcommand=treescrolly.set)
+    
+    def fileDialog(v):
+        global filename
+        filename = filedialog.askopenfilename(initialdir ="/", title = "Select a file") #, filetype = (('text files', 'txt'),)
+        v.set(filename)
+    global filename
+    entries = {}
+    row = Frame(root)
+    row.pack(fill = X, padx = 5, pady = 5)
+    lab = Label(row, text = title,font=(None, 15) ,)
+    lab.pack(side=LEFT)
+    row = Frame(root)
+    row.pack(fill = X, padx = 5, pady = 5)
+    lab = Label(row, text = description,font=(None, 10), wraplength = 580, justify = LEFT )
+    lab.pack(side=LEFT)
+    for field in fields:
+        row = Frame(root)
+        lab = Label(row, width=22, text=field+": ", anchor='w')
+        ent = Entry(row, width=40)
+        ent.insert(0,"0")
+        row.pack(side = TOP, fill = X, padx = 5 , pady = 5)
+        lab.pack(side = LEFT,fill = X, padx = 10 , pady = 0)
+        ent.pack(side = RIGHT, expand = YES, fill = X)
+        entries[field] = ent
+    if view:
+        #row = LabelFrame(root, text="Data", height=250, width=600)
+        sub_row1 = Frame(root)
+        sub_row2 = Frame(root)
+        tv1 = ttk.Treeview(sub_row1)
+        treescrolly = Scrollbar(sub_row1, orient="vertical", command=tv1.yview)
+        treescrollx = Scrollbar(sub_row2, orient="horizontal", command=tv1.xview)
+        tv1.configure(xscrollcommand=treescrollx.set, yscrollcommand=treescrolly.set)
 
-		row.pack(side = TOP, fill = X, expand = True,  padx = 5 , pady = 5) #,  padx = 5 , pady = 5
-		sub_row1.pack(side = TOP, fill = X, expand = True,  padx = 5 , pady = 5)
-		tv1.pack(side = LEFT, fill = X, expand = True,  padx = 5 , pady = 5) #, padx = 5 , pady = 5     
-		treescrolly.pack(side="left", fill="y")
-		#row.pack(side = BOTTOM, fill = X, padx = 5 , pady = 5) 
-		sub_row2.pack(side = TOP, fill = X, expand = True,  padx = 5 , pady = 5)
-		treescrollx.pack(side="bottom", fill="x")   
+        row.pack(side = TOP, fill = X, expand = True,  padx = 5 , pady = 5) #,  padx = 5 , pady = 5
+        sub_row1.pack(side = TOP, fill = X, expand = True,  padx = 5 , pady = 5)
+        tv1.pack(side = LEFT, fill = X, expand = True,  padx = 5 , pady = 5) #, padx = 5 , pady = 5
+        treescrolly.pack(side="left", fill="y")
+        #row.pack(side = BOTTOM, fill = X, padx = 5 , pady = 5)
+        sub_row2.pack(side = TOP, fill = X, expand = True,  padx = 5 , pady = 5)
+        treescrollx.pack(side="bottom", fill="x")
 
-		entries['tv1'] = tv1
+        entries['tv1'] = tv1
 
     # button to search a file
-	if file:
-		row = Frame(root)
-		v = StringVar()
-		lab = Label(row, textvariable = v)
-		btn = Button(row, text = "File", height=2, width=12, command = lambda arg1=v : fileDialog(arg1))
-		row.pack(side=TOP, fill=X, expand = True)
-		btn.pack(side= LEFT,padx = 5 , pady = 5)		
-		lab.pack(side=LEFT)
+    if file:
+        row = Frame(root)
+        v = StringVar()
+        lab = Label(row, textvariable = v)
+        btn = Button(row, text = "File", height=2, width=12, command = lambda arg1=v : fileDialog(arg1))
+        row.pack(side=TOP, fill=X, expand = True)
+        btn.pack(side= LEFT,padx = 5 , pady = 5)
+        lab.pack(side=LEFT)
 
         
     # button to call the
-	row = Frame(root)
-	btn = Button(row, text = "Call", height=2, width=12)
-	row.pack(side=TOP, fill=X, expand = True)
-	btn.pack(side= LEFT,padx = 5 , pady = 5)
-	entries["btn"]=btn
+    row = Frame(root)
+    btn = Button(row, text = "Call", height=2, width=12)
+    row.pack(side=TOP, fill=X, expand = True)
+    btn.pack(side= LEFT,padx = 5 , pady = 5)
+    entries["btn"]=btn
     
     # button to call the function
-	row = Frame(root)
-	s = ttk.Separator(row, orient=HORIZONTAL )
-	row.pack(fill=X,padx = 5 , pady = 5)
-	s.pack(fill = X)
+    row = Frame(root)
+    s = ttk.Separator(row, orient=HORIZONTAL )
+    row.pack(fill=X,padx = 5 , pady = 5)
+    s.pack(fill = X)
     
     
-	return entries
+    return entries
 
 def main_loop(web3,contract,function_info):
     account_list = web3.eth.accounts

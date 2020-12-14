@@ -406,11 +406,11 @@ def load_txt():
    --------------
    nothing, loads the file
    """
-    global filename
-    file=open(filename,"r")
-    separator,unencrypted_message,tender_id=[i.replace("\n","") for i in file.readlines()]
-    file.close()
-    return tender_id,unencrypted_message,separator
+   global filename
+   file=open(filename,"r")
+   separator,unencrypted_message,tender_id=[i.replace("\n","") for i in file.readlines()]
+   file.close()
+   return tender_id,unencrypted_message,separator
 
 
 def send_unencrypted_solidity(web3,contract,tender_id, unencrypted_message,separator):
@@ -428,6 +428,6 @@ def send_unencrypted_solidity(web3,contract,tender_id, unencrypted_message,separ
    --------------
    nothing, executes the solidity function
    """
-    contract.functions.concludeBid(int(tender_id),unencrypted_message,separator).transact()
+   contract.functions.concludeBid(int(tender_id),unencrypted_message,separator).transact()
     
 
