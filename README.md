@@ -1,6 +1,16 @@
 # **Blockchain-based Public Tendering**
 This project is part of the Finance with Big Data course at Bocconi University. In this repository, we develop a Solidity-based smart contract focused on tendering procedures. We believe Blockchain technology has the potential to disrupt the procurement field, that is the process of researching and exchanging goods and services often done by tendering procedures. Indeed, by transforming the tendering as a smart contract we would be able to improve the procurement by reducing the duration of a tendering – which is very costly – and the possibility of corruption that might happen. In turns, this would improve the welfare of the economy as well as our society. 
-These are our motivations behind the project. Now, let’s deepen into our implementation. 
+These are our motivations behind the project. Now, let’s deepen into our implementation.
+
+## **Repository Overview**
+```PA.sol``` : This contract is used by the user with an administrative role in the creation of the two main subjects that participate in our blockchain: the Public Administration and the firms. Through the functions in this contract their roles are assigned in order to allow them to carry out the appropriate interactions with the main contract. 
+```SafeMath.sol``` : The SafeMath library is created, which reverts transactions when an operation overflows and removes the risk of bugs when dealing with arithmetic operations. 
+```Tendering.sol``` : The main contract of our blockchain, this contains the functions for the whole tendering procedure. All four parts of the process are considered: request, bidding, evaluation, and publishing. 
+```config.py``` : This python code sets up the application binary interface (ABI) to be used by the public administration, with the functions associated to this role. 
+```gasPlot.jpeg``` : An image representing the decreases in transaction cost, based on gas, that occurred following the changes to the main smart contract.
+```strings.sol``` : The strings and slice utility libraries are created, to be used for certain operations in the smart contract.
+```userinterface.py``` : This python code produces the user interface that allows access to our smart contract and blockchain, with all the associated functions of the Tendering.sol file used for the tendering procedure.
+```utils.py``` : This python code defines the functions to be implemented in the user interface.
 
 ## **Access Control with PA.sol**
 Access control is crucial on the Blockchain, since we want to control who is allowed to do what in a tendering procedure. According to our approach, tendering procedures can be accessed by three different agents: the public administration that issues a request for tender, a firm that sends a bid, and finally a citizen that wants to access the process and check its fairness. Clearly, each of the agents involved has different powers in terms of accessibility. We implemented the aforementioned structure by following OpenZeppelin’s instructions (https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/AccessControl.sol), and we created a Role-based Access Control system for our smart contract that you can find in PA.sol. 
