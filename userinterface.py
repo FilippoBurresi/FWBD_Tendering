@@ -3,6 +3,7 @@ from tkinter import messagebox
 from tkinter import ttk
 from tkinter import filedialog
 from utils import *
+import os
 
 filename = "/"
 
@@ -10,7 +11,7 @@ filename = "/"
 def makeform(root, fields, title="Lorem Ipsum", description="Lorem Ipsum description",view = False, file = False):
     
     def fileDialog(v):
-        filename = filedialog.askopenfilename(initialdir ="/", title = "Select a file") #, filetype = (('text files', 'txt'),)
+        filename = filedialog.askopenfilename(initialdir =os.getcwd(), title = "Select a file") #, filetype = (('text files', 'txt'),)
         v.set(filename)
 
     entries = {}
