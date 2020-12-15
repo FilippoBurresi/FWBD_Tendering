@@ -75,4 +75,22 @@ To optimize the smart contract we combined different adjustments: from eliminati
   <img width="460" height="300" src="https://github.com/FilippoBurresi/FWBD_Tendering/blob/main/gasPlot.jpeg">
 </p>
 
+## **Security**
+
+With smart contracts, the implementation of rules and procedures becomes easier and quicker.
+However, there is always a drawback: the security might be at risk if not adequately handled.
+We have discussed and thought a lot about what could possibly go wrong in our system.
+
+Just in order to prevent any security breaches, we have built a Role-based Access Control system through OpenZeppelin.
+In this way, we can control all the agents who interact and be sure that nobody does something he has not been authorized to do.
+For example, without this role-based system, one main problem we could have incurred is that some malicious users could have started to send a very large amount of bids.
+The cost of some functions in our smart contract, especially compute_scores and assign_winner which rely on a for loop whose length depends on the number of participants,  would have rocketed, causing consequently an unsustainable economical burden for the PA, creator of the tender.
+Since in our contract the Public Administration has to authorize each firm prior to the bidding phase, the aforementioned risk has been avoided.
+
+We have also assured that each rule is respected by inserting various require() that prevent, for example, any offer beyond the deadline from being considered and evaluated  or, yet, any bidder from modifying its own project once sent.
+Moreover, we have also taken security measures on the numerical side: indeed we avoid overflows by making use of the SafeMath library.
+
+Lastly, we have also evaluated the possibility to  insert an additional function in our SmartContract to let the PA withdraw a tender at any moment. However, we thought that if this function, on one hand, would have provided the PA with the possibility of overcoming any problem the tendering procedure might face, on the other it would have opened a not very realist scenario since if a Public Administration needs a certain service or product and launches a tender, then it will difficulty step back.
+
+
 
