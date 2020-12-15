@@ -3,13 +3,20 @@ This project is part of the Finance with Big Data course at Bocconi University. 
 These are our motivations behind the project. Now, let’s deepen into our implementation.
 
 ## **Repository Overview**
-```PA.sol``` : This contract is used by the user with an administrative role in the creation of the two main subjects that participate in our blockchain: the Public Administration and the firms. Through the functions in this contract their roles are assigned in order to allow them to carry out the appropriate interactions with the main contract. 
-```SafeMath.sol``` : The SafeMath library is created, which reverts transactions when an operation overflows and removes the risk of bugs when dealing with arithmetic operations. 
+```PA.sol``` : This contract is used by the user with an administrative role in the creation of the two main subjects that participate in our blockchain: the Public Administration and the firms. Through the functions in this contract their roles are assigned in order to allow them to carry out the appropriate interactions with the main contract.
+
+```SafeMath.sol``` : The SafeMath library is created, which reverts transactions when an operation overflows and removes the risk of bugs when dealing with arithmetic operations.
+
 ```Tendering.sol``` : The main contract of our blockchain, this contains the functions for the whole tendering procedure. All four parts of the process are considered: request, bidding, evaluation, and publishing. 
+
 ```config.py``` : This python code sets up the application binary interface (ABI) to be used by the public administration, with the functions associated to this role. 
+
 ```gasPlot.jpeg``` : An image representing the decreases in transaction cost, based on gas, that occurred following the changes to the main smart contract.
+
 ```strings.sol``` : The strings and slice utility libraries are created, to be used for certain operations in the smart contract.
+
 ```userinterface.py``` : This python code produces the user interface that allows access to our smart contract and blockchain, with all the associated functions of the Tendering.sol file used for the tendering procedure.
+
 ```utils.py``` : This python code defines the functions to be implemented in the user interface.
 
 ## **Access Control with PA.sol**
