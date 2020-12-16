@@ -3,7 +3,7 @@ This project is part of the Finance with Big Data course at Bocconi University. 
 These are our motivations behind the project. Now, let’s deepen into our implementation.
 
 ## **Repository Overview**
-```PA.sol``` : This contract is used by the user with an administrative role in the creation of the two main subjects that participate in our blockchain: the Public Administration and the firms. Through the functions in this contract their roles are assigned in order to allow them to carry out the appropriate interactions with the main contract.
+```PA.sol``` : This contract - from which our main smart contract inherits - is used by the user with an administrative role in the creation of the two main subjects that participate in our blockchain: the Public Administration and the firms. Through the functions in this contract their roles are assigned in order to allow them to carry out the appropriate interactions with the main contract.
 
 ```SafeMath.sol``` : The SafeMath library is created, which reverts transactions when an operation overflows and removes the risk of bugs when dealing with arithmetic operations.
 
@@ -81,16 +81,14 @@ With smart contracts, the implementation of rules and procedures becomes easier 
 However, there is always a drawback: the security might be at risk if not adequately handled.
 We have discussed and thought a lot about what could possibly go wrong in our system.
 
-Just in order to prevent any security breaches, we have built a Role-based Access Control system through OpenZeppelin.
-In this way, we can control all the agents who interact and be sure that nobody does something he has not been authorized to do.
-For example, without this role-based system, one main problem we could have incurred is that some malicious users could have started to send a very large amount of bids.
+Just in order to prevent any security breaches, we have built a Role-based Access Control system through OpenZeppelin and we limited the number of times a firm can send a bid for a specific tendering.
+In this way, we not only can control all the agents who interact and be sure that nobody does something he has not been authorized to do but we can also control the number of bids.
+For example, without this role-based system and threshold for the bids, one main problem we could have incurred is that some malicious users could have started to send a very large amount of bids.
 The cost of some functions in our smart contract, especially compute_scores and assign_winner which rely on a for loop whose length depends on the number of participants,  would have rocketed, causing consequently an unsustainable economical burden for the PA, creator of the tender.
-Since in our contract the Public Administration has to authorize each firm prior to the bidding phase, the aforementioned risk has been avoided.
+Since in our contract the Public Administration has to authorize each firm prior to the bidding phase and those authorized firm can only bid once, the aforementioned risk has been avoided.
 
-We have also assured that each rule is respected by inserting various require() that prevent, for example, any offer beyond the deadline from being considered and evaluated  or, yet, any bidder from modifying its own project once sent.
-Moreover, we have also taken security measures on the numerical side: indeed we avoid overflows by making use of the SafeMath library.
+We have also assured that each rule is respected by inserting various ```require()``` that prevent, for example, any offer beyond the deadline from being considered and evaluated  or, yet, any bidder from modifying its own project once sent.
+Moreover, we have also taken security measures on the numerical side: indeed we avoid overflows by making use of the ```SafeMath``` library.
 
-Lastly, we have also evaluated the possibility to  insert an additional function in our SmartContract to let the PA withdraw a tender at any moment. However, we thought that if this function, on one hand, would have provided the PA with the possibility of overcoming any problem the tendering procedure might face, on the other it would have opened a not very realist scenario since if a Public Administration needs a certain service or product and launches a tender, then it will hardly step back.
-
-
+Lastly, we have also evaluated the possibility to  insert an additional function in our Smart Contract to let the PA withdraw a tender at any moment. However, we thought that if this function, on one hand, would have provided the PA with the possibility of overcoming any problem the tendering procedure might face, on the other it would have opened a not very realist scenario since if a Public Administration needs a certain service or product and launches a tender, then it will hardly step back. Furthermore, it will cause a great disincentive for firms to participate in a Blockchain-based public tendering. Indeed, if the PA has the power to withdraw a tender then firms trust less the whole system and become reluctant to spend money and efforts to send a bid if they encounter the risk of withdraw. 
 
