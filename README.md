@@ -71,7 +71,6 @@ The code in ```Tendering.sol``` has been optimized so to spend less gas as we ca
 
 To optimize the smart contract we combined different adjustments:  
 * eliminated redundant variables and events
-* avoided the initialization of numeric variables 
 * readjusted the order of the variables to save space 
 * carefull consideration about function type (public, external, internal, private, pure and view)
 * use of calldata and memory type inside functions
