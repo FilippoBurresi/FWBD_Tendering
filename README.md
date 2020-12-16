@@ -71,8 +71,8 @@ The code in ```Tendering.sol``` has been optimized so to spend less gas as we ca
 
 To optimize the smart contract we combined different adjustments:  
 * eliminated redundant variables and events
-* readjusted the order of the variables to save space 
-* carefull consideration about function type (public, external, internal, private, pure and view)
+* readjusted the order of variables to save space 
+* careful consideration about function type (public, external, internal, private, pure and view)
 * use of calldata and memory type inside functions
 
 Overall, we were able to save 292167 wei of transaction costs. Here, a more comprehensive plot of the results of the optimization steps that we followed: 
