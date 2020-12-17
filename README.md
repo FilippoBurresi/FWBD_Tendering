@@ -60,7 +60,7 @@ The related files of this part to refer to are:
 userinterface.py
 utils.py
 config.py
-SmartContractUserInteraction.py
+main.py
 ```
 We wanted to create a intuitive way to interact with the Tendering Smart-Contract both for the PA in the tender creation process and for the firms willing to participate in a tender and all those citizens interested in investigating the correctness and fairness of the tendering procedure. In order to do so, we develop a web3-based python code capable of connecting each address to the range of functions specific to its own role. We also built a user-friendly interface based on the above-mentioned code thanks to the Tkinter library through which we created a prototype implementation of our model: in this way, you can get an idea of how the Smart Contract works.
 To make this prototype more usable in the testing phase, the possibility to change at will the account with which to interact with the smart contract has been inserted in the login tab in order to see the difference in terms of permissions between the various types of accounts (PA, allowed contractor and citizen)
