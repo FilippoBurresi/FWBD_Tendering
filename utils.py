@@ -222,32 +222,35 @@ def get_bids_details(web3,contract,input_dict):
    try:
         input_dict['tv1'].delete(*input_dict['tv1'].get_children()) 
         tender_id = int(input_dict['tender id'].get())
-        num_bids=contract.functions.getResultsLenght(tender_id).call()
-        bids_list=[]
-        for i in range(0,num_bids):
-            address,score,winner=contract.functions.getResultsValue(tender_id,i).call()
-            bids_list.append(contract.functions.getBidDetails(tender_id,address).call())
-            print(bids_list)
-        df = pd.DataFrame(bids_list,columns=["address","description","separator used","score","winner?"])
-        dict_address={address:web3.eth.accounts.index(address) for address in web3.eth.accounts}
-        df["account"]=df["address"].apply(lambda x: dict_address[x])
-        df["price"]=df["description"].apply(lambda x: x[0])
-        df["time"]=df["description"].apply(lambda x: x[1])
-        df["environment"]=df["description"].apply(lambda x: x[2])
-        df=df[["account","separator used","price","time","environment","score","winner?"]]
-        df.sort_values(by="score",ascending=True,inplace=True)
-        input_dict['tv1']["column"] = list(df.columns)
-        for column in input_dict['tv1']["column"]:
-            input_dict['tv1'].column(column,minwidth=0, width=78, stretch=NO)
-        input_dict['tv1']["show"] = "headings"
-        for column in input_dict['tv1']["columns"]:
-            input_dict['tv1'].heading(column, text=column) # let the column heading = column name
-        
-        df_rows = df.to_numpy().tolist() # turns the dataframe into a list of lists
-        for row in df_rows:
-            input_dict['tv1'].insert("", "end", values=row)
+        if contract.functions.see_TenderDetails(tender_id).call()[5]!="0x0000000000000000000000000000000000000000":
+            num_bids=contract.functions.getResultsLenght(tender_id).call()
+            bids_list=[]
+            for i in range(0,num_bids):
+                address,score,winner=contract.functions.getResultsValue(tender_id,i).call()
+                bids_list.append(contract.functions.getBidDetails(tender_id,address).call())
+                print(bids_list)
+            df = pd.DataFrame(bids_list,columns=["address","description","separator used","score","winner?"])
+            dict_address={address:web3.eth.accounts.index(address) for address in web3.eth.accounts}
+            df["account"]=df["address"].apply(lambda x: dict_address[x])
+            df["price"]=df["description"].apply(lambda x: x[0])
+            df["time"]=df["description"].apply(lambda x: x[1])
+            df["environment"]=df["description"].apply(lambda x: x[2])
+            df=df[["account","separator used","price","time","environment","score","winner?"]]
+            df.sort_values(by="score",ascending=True,inplace=True)
+            input_dict['tv1']["column"] = list(df.columns)
+            for column in input_dict['tv1']["column"]:
+                input_dict['tv1'].column(column,minwidth=0, width=78, stretch=NO)
+            input_dict['tv1']["show"] = "headings"
+            for column in input_dict['tv1']["columns"]:
+                input_dict['tv1'].heading(column, text=column) # let the column heading = column name
+            
+            df_rows = df.to_numpy().tolist() # turns the dataframe into a list of lists
+            for row in df_rows:
+                input_dict['tv1'].insert("", "end", values=row)
+        else:
+            messagebox.showerror("Error", "The PA has not appointed the winner yet")
    except Exception as e:
-        messagebox.showerror("Allowed Companies", str(e))
+        messagebox.showerror("Error", str(e))
 
 
     
