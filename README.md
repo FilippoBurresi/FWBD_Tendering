@@ -3,7 +3,7 @@ This project is part of the Finance with Big Data course at Bocconi University. 
 These are our motivations behind the project. Now, let’s deepen into our implementation.
 
 ## **Repository Overview**
-```PA.sol``` : This contract is used by the user with an administrative role in the creation of the two main subjects that participate in our blockchain: the Public Administration and the firms. Through the functions in this contract their roles are assigned in order to allow them to carry out the appropriate interactions with the main contract.
+```PA.sol``` : This contract - from which our main smart contract inherits - is used by the user with an administrative role in the creation of the two main subjects that participate in our blockchain: the Public Administration and the firms. Through the functions in this contract their roles are assigned in order to allow them to carry out the appropriate interactions with the main contract.
 
 ```SafeMath.sol``` : The SafeMath library is created, which reverts transactions when an operation overflows and removes the risk of bugs when dealing with arithmetic operations.
 
@@ -50,29 +50,57 @@ In the following sections, we are going to present some examples of how firms an
 
 ### *PA-Role*
 
-From the user interface, the public administration can easily create a tender by entering the details via text inputs. It can also give permission to some accounts to place bids and finally declare the winner once the tendering is closed.
+From the user interface, the public administration can easily create a tender by entering the details via text inputs. It can also give permission to some accounts to place bids (by inserting a comma separated list of account ids) and finally declare the winner once the tendering is closed.
 
 ### *Firm-Role* 
 
-A company can view in tabular form from the Notice Board tab all the tenders currently active (this does not require any permission). Then, according to the one that better suits its offer, the firm will decide where to participate. In fact, once the company is authorized by the PA, to send its own proposal to the blockchain, the firm has just to call the SendBid function and to specify the characteristics of its bid. The three elements of the offer – price, estimated time of realization, environment-friendliness score – will be automatically saved in a txt file in the working directory and the hash of the offer will be then sent to the blockchain by calling the placeBid solidity function.  The company will use the txt file by uploading it and then, through the appropriate function, complete the offer. In fact, the smart contract will check whether the hash matches the extended offer before validating it and exposing it to evaluation.
+A company can view in tabular form from the Notice Board tab all the tenders currently active (this does not require any permission). Then, according to the one that better suits its offer, the firm will decide where to participate. In fact, once the company is authorized by the PA, to send its own proposal to the blockchain, the firm has just to call the SendBid function and to specify the characteristics of its bid. The three elements of the offer – price, estimated time of realization, environment-friendliness score – will be automatically merged in a string with 10 random characters as separators. This "enencrypted message" will be saved in a txt file in the working directory and its hash  will be then sent to the blockchain by calling the placeBid solidity function.  The company will conclude the bid by uploading the txt file that contains the enencrypted message, the separator and the tender_id, this data will be sent to the blockchain. There, the smart contract will check whether the hash matches the extended offer before validating it and exposing it to evaluation.
 
 
-All these steps can be performed and visualized by accessing the tkinter interface, choosing an address granted with firm role (1-8) in the first window and then playing within the notice board and the contractor windows.
+All these steps can be performed and visualized by accessing the tkinter interface, choosing an address granted with firm role in the first window and then playing within the notice board and the contractor windows.
 
 ### *Citizen (every account)*
 
 Any citizen with an account can call all the functions present in the Notice Board tab and that show in tabular form all the active tenders, the tenders already concluded and all the offers related to a specific tender. The goal of this function is to make the operation of the smart contract transparent, giving citizens the opportunity to verify its work.
 
-The previous step can be performed by choosing every account in the in the login tab.
+"see active tenders" and "see closed tenders" return a dataframe through a for loop of the solidity function "see_TenderDetails" (input: tender_id), filtering their state (active, closed) with the solidity function "isPending" (input: tender_id).
+
+"Get Bids Details" can be called after a tender is closed and returns a dataframe through a for loop of the solidity function "getBidDetails" (input: tender_id, address of the contractor)
+
+The previous step can be performed by choosing every account in the login tab.
 
 ## **Optimization**
 
 The code in ```Tendering.sol``` has been optimized so to spend less gas as we can in transactions. This is crucial to make our project appealing to both public administrations and firms. Indeed, our goal is to show how easy, transparent and cheap are Blockchain-based tendering procedures to these two main actors. On the other hand, citizens do not spend any gas in checking the tendering since we took care of expressing those functions as pure/view. 
 
-To optimize the smart contract we combined different adjustments: from eliminating redundant variables and events to small changes like avoiding the initialization of numeric variables and readjusting the order of the variables inside functions. Overall, we were able to save 292167 wei of transaction costs. Here, a more comprehensive plot of the results of the optimization steps that we followed: 
+To optimize the smart contract we combined different adjustments:  
+* eliminated redundant variables and events
+* readjusted the order of variables to save space 
+* careful consideration about function type (public, external, internal, private, pure and view)
+* use of calldata and memory type inside functions
+
+Overall, we were able to save 292167 wei of transaction costs. Here, a more comprehensive plot of the results of the optimization steps that we followed: 
 
 <p align="center">
   <img width="460" height="300" src="https://github.com/FilippoBurresi/FWBD_Tendering/blob/main/gasPlot.jpeg">
 </p>
 
+## **Security**
+
+With smart contracts, the implementation of rules and procedures becomes easier and quicker.
+However, there is always a drawback: the security might be at risk if not adequately handled.
+We have discussed and thought a lot about what could possibly go wrong in our system.
+
+Just in order to prevent any security breaches, we have built a Role-based Access Control system through OpenZeppelin and we limited the number of times a firm can send a bid for a specific tendering.
+In this way, we not only can control all the agents who interact and be sure that nobody does something he has not been authorized to do but we can also control the number of bids.
+For example, without this role-based system and threshold for the bids, one main problem we could have incurred is that some malicious users could have started to send a very large amount of bids.
+The cost of some functions in our smart contract, especially compute_scores and assign_winner which rely on a for loop whose length depends on the number of participants,  would have rocketed, causing consequently an unsustainable economical burden for the PA, creator of the tender.
+Since in our contract the Public Administration has to authorize each firm prior to the bidding phase and those authorized firm can only bid once, the aforementioned risk has been avoided.
+
+Another security issue was how to deliver the confidential data of a bid without any risk of revealing those date before the deadline. We decided to create 2 deadline windows, one for the hash and one with the actual data. Since there are many SHA-3 libraries online we had to create an unencrypted message difficult to crack, we decided to separate each of our sensibile data (price, time, environment) with 10 random characters (including special characters) and then create a single string to hash (for example if the data [price, time, environment] are= [1000,50,4] the unencrypted message to hash will be "**1000**!#28fjrc5@**50**!#28fjrc5@**4**!#28fjrc5@"). This turned out to be a good solution not only for security reasons but also to avoid complicate structures (lists, tuples,dictionaries) to hash. After the submission of the hash is txt file is created **ONLY IN THE LOCAL MACHINE** with the tender id, the unencrypted message and the separator. Before the second deadline the company has to deliver the txt file that will be elaborated firstly by the python code (output=tender_id, unencrypted message, separator) and then by the smart contract that will check if the hashes match and will split the unencrypted message in the sensitive data (price,time,environment). Doing so, it's impossible even for the PA to know the bid details before the hash deadline that is mandatory for every firm. It is also really difficult to crack the hash with brute force since the 10 characters separator is different for every bid of every tender and it is sent to the blockchain only after the hash deadline.
+
+We have also assured that each rule is respected by inserting various ```require()``` that prevent, for example, any offer beyond the deadline from being considered and evaluated  or, yet, any bidder from modifying its own project once sent.
+Moreover, we have also taken security measures on the numerical side: indeed we avoid overflows by making use of the ```SafeMath``` library.
+
+Lastly, we have also evaluated the possibility to  insert an additional function in our Smart Contract to let the PA withdraw a tender at any moment. However, we thought that if this function, on one hand, would have provided the PA with the possibility of overcoming any problem the tendering procedure might face, on the other it would have opened a not very realist scenario since if a Public Administration needs a certain service or product and launches a tender, then it will hardly step back. Furthermore, it will cause a great disincentive for firms to participate in a Blockchain-based public tendering. Indeed, if the PA has the power to withdraw a tender then firms trust less the whole system and become reluctant to spend money and efforts to send a bid if they encounter the risk of withdrawal. 
 
