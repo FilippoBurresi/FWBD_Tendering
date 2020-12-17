@@ -290,7 +290,7 @@ def send_bid(web3,contract, input_dict):
             send_bid_solidity(web3,contract,tender_id,hash)
             save_txt(web3,str(web3.eth.defaultAccount),str(separator),unencrypted_message,str(tender_id))
             messagebox.showinfo("Send bid", "The bid has been sent successfully")
-   except Exception as e:
+   except:
         messagebox.showerror("Allowed Companies", "you might not have permissions to create a bid or the tender is closed. Remember you can send only one bid per Tender")
     
 def send_unencrypted(web3,contract, input_dict):
@@ -312,7 +312,7 @@ def send_unencrypted(web3,contract, input_dict):
        tender_id,unencrypted_message,separator=load_txt(filename)
        send_unencrypted_solidity(web3,contract,tender_id,unencrypted_message,separator)
        messagebox.showinfo("Bid Completed", "The unencripted bid has been sent")
-   except Exception as e:
+   except:
        messagebox.showerror("Allowed Companies", "you might not have permissions to conclude a bid, you are not in the window time to conclude the bid or the data you sent doesn't match with the previous ones")
 
 
