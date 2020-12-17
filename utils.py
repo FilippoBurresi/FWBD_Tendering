@@ -325,7 +325,7 @@ def to_string_and_sep(l):
    Returns
    --------------
    the string with the separator and the separator
-   ex. "hi##I##am", "##"
+   ex. "hi##I##am##", "##"
    """
    s="".join(l)
    while True:
