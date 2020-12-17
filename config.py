@@ -1,12 +1,12 @@
 
 ganache_URL="HTTP://127.0.0.1:7545"
-address="0xDbe731c0051ab4e95cCb2F28ba1475da5FCeF872"
+address="0xFD5640cEdFfaccFF5393E4d98BCe0075D55174Af"
 
 function_info = {'Create Tender': "This function is used to create tenders and can only be called by the public administration. The         first time variable indicates how soon (seconds) the complete offers can be loaded and within       which the hash must be loaded, while the second expiry indicates in how many days (seconds)     the tender will expire.The weights indicate the importance that we want the price, the speed of execution and the environmental impact to have, their sum must be equal to 100.",
 			   'Place Bid': 'This function is used to make an offer to the tender indicated by the tender id. It can only be used by PA approved contractors. The price in euros, the execution time in days and the environmental impact (on a scale 1 to 4) must be indicated . Once the function is called, it will insert the hash of the offer in the blockchain and create a file with the information necessary to complete the offer       that will be saved in the working directory',
 			   'Conclude Bid': 'By clicking "File" upload the file created in the previous step to complete the offer. Once the file     has been loaded, the path will be displayed to the right of the button. At this point it is possible to complete the offer by clicking "Call", remind to click after the first expiry date (sending encrypted values) and before the second one (tender expiration).',
 			   'See Active Tenders': 'Through this function, citizens and contractor can see the details of currently active tenders. To better visualize the content, you can resize the width of the columns.',
-			   'See Closed Tenders': 'Through this function, citizens and contractor can see the details of closed tenders. To better visualize the content, you can resize the width of the columns.',
+			   'See Closed Tenders': 'Through this function, citizens and contractor can see the details of closed or pending tenders. To better visualize the content, you can resize the width of the columns.',
 			   'Allow Companies': 'This function allows companies to give permission to bid. The input is the account index for convenience and more than one can be entered at a time if separated by commas (in a normal scenario the input would be the address)',
 			   "Get Bids Details": 'Through this function it is possible given the tender id of a completed tender to see the details of      all the offers presented after the PA has assigned the winner',
 			   'Assign Winner': 'This function allows you to assign the winner to the tender specified by the id (only after the deadline), who will be awarded automatically by evaluating the offers made by the contractors according to the parameters entered in the tender.',}
