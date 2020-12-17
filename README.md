@@ -83,7 +83,7 @@ Any citizen with an account can call all the functions present in the Notice Boa
 
 "see active tenders" and "see closed tenders" return a dataframe through a for loop of the solidity function "see_TenderDetails" (input: tender_id), filtering their state (active, closed) with the solidity function "isPending" (input: tender_id).
 
-"Get Bids Details" can be called after a tender is closed and returns a dataframe through a for loop of the solidity function "getBidDetails" (input: tender_id, address of the contractor)
+"Get Bids Details" can be called after a tender is closed and the winner assigned and returns a dataframe through a for loop of the solidity function "getBidDetails" (input: tender_id, address of the contractor)
 
 The previous step can be performed by choosing every account in the login tab.
 
