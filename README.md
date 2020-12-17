@@ -1,6 +1,5 @@
 # **Blockchain-based Public Tendering**
-This project is part of the Finance with Big Data course at Bocconi University. In this repository, we develop a Solidity-based smart contract focused on tendering procedures. We believe Blockchain technology has the potential to disrupt the procurement field, that is the process of researching and exchanging goods and services often done by tendering procedures. Indeed, by transforming the tendering as a smart contract we would be able to improve the procurement by reducing the duration of a tendering – which is very costly – and the possibility of corruption that might happen. In turns, this would improve the welfare of the economy as well as our society. 
-These are our motivations behind the project. Now, let’s deepen into our implementation.
+This project is part of the Finance with Big Data course at Bocconi University. In this repository, we develop a Solidity-based smart contract focused on tendering procedures. We believe Blockchain technology has the potential to disrupt the procurement field, that is the process of researching and exchanging goods and services often done by tendering procedures. Indeed, by transforming the tendering as a smart contract we would be able to improve the procurement by reducing the duration of a tendering – which is very costly – and the possibility of corruption that might happen. In turns, this would improve the welfare of the economy as well as our society. These are our motivations. Let's now deepen into the project. 
 
 ## **Repository Overview**
 ```PA.sol``` : This contract - from which our main smart contract inherits - is used by the user with an administrative role in the creation of the two main subjects that participate in our blockchain: the Public Administration and the firms. Through the functions in this contract their roles are assigned in order to allow them to carry out the appropriate interactions with the main contract.
@@ -18,6 +17,25 @@ These are our motivations behind the project. Now, let’s deepen into our imple
 ```userinterface.py``` : This python code produces the user interface that allows access to our smart contract and blockchain, with all the associated functions of the Tendering.sol file used for the tendering procedure.
 
 ```utils.py``` : This python code defines the functions to be implemented in the user interface.
+
+```main.py``` : This file allows the smart contract to interact with users. 
+
+## **Deployment**
+First time user:
+- install Ganache
+- compile ```Tendering.sol``` on Remix 
+- deploy it using as environment Web3 Provider and connect it to the RPC Server of Ganache
+- copy the address of the smart contract just deployed in ```config.py``` under the name ```address```
+
+After that: 
+- cd into project root directory
+- run on the prompt line ```python main.py``` 
+
+Immediately, the user interface will pop out and you can start playing with our project!
+
+When using Ganache, you have 10 addresses at your disposal. We set the first as the only one allowed to play as Public Administration whereas the addresses from 1 to 8 can play as Contractors. The last address instead plays as Citizen. When the user interface comes out, you have to login with the credentials of the address that you want to play with.
+
+So far, we have shown you our motivations, the repository overview and a quick set of tips when running the project the first time. Now, let’s deepen into our implementation.
 
 ## **Access Control with PA.sol**
 Access control is crucial on the Blockchain, since we want to control who is allowed to do what in a tendering procedure. According to our approach, tendering procedures can be accessed by three different agents: the public administration that issues a request for tender, a firm that sends a bid, and finally a citizen that wants to access the process and check its fairness. Clearly, each of the agents involved has different powers in terms of accessibility. We implemented the aforementioned structure by following OpenZeppelin’s instructions (https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/AccessControl.sol), and we created a Role-based Access Control system for our smart contract that you can find in PA.sol. 
