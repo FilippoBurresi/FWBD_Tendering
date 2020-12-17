@@ -50,20 +50,24 @@ In the following sections, we are going to present some examples of how firms an
 
 ### *PA-Role*
 
-From the user interface, the public administration can easily create a tender by entering the details via text inputs. It can also give permission to some accounts to place bids and finally declare the winner once the tendering is closed.
+From the user interface, the public administration can easily create a tender by entering the details via text inputs. It can also give permission to some accounts to place bids (by inserting a comma separated list of account ids) and finally declare the winner once the tendering is closed.
 
 ### *Firm-Role* 
 
-A company can view in tabular form from the Notice Board tab all the tenders currently active (this does not require any permission). Then, according to the one that better suits its offer, the firm will decide where to participate. In fact, once the company is authorized by the PA, to send its own proposal to the blockchain, the firm has just to call the SendBid function and to specify the characteristics of its bid. The three elements of the offer – price, estimated time of realization, environment-friendliness score – will be automatically saved in a txt file in the working directory and the hash of the offer will be then sent to the blockchain by calling the placeBid solidity function.  The company will use the txt file by uploading it and then, through the appropriate function, complete the offer. In fact, the smart contract will check whether the hash matches the extended offer before validating it and exposing it to evaluation.
+A company can view in tabular form from the Notice Board tab all the tenders currently active (this does not require any permission). Then, according to the one that better suits its offer, the firm will decide where to participate. In fact, once the company is authorized by the PA, to send its own proposal to the blockchain, the firm has just to call the SendBid function and to specify the characteristics of its bid. The three elements of the offer – price, estimated time of realization, environment-friendliness score – will be automatically merged in a string with 10 random characters as separators. This "enencrypted message" will be saved in a txt file in the working directory and its hash  will be then sent to the blockchain by calling the placeBid solidity function.  The company will conclude the bid by uploading the txt file that contains the enencrypted message, the separator and the tender_id, this data will be sent to the blockchain. There, the smart contract will check whether the hash matches the extended offer before validating it and exposing it to evaluation.
 
 
-All these steps can be performed and visualized by accessing the tkinter interface, choosing an address granted with firm role (1-8) in the first window and then playing within the notice board and the contractor windows.
+All these steps can be performed and visualized by accessing the tkinter interface, choosing an address granted with firm role in the first window and then playing within the notice board and the contractor windows.
 
 ### *Citizen (every account)*
 
 Any citizen with an account can call all the functions present in the Notice Board tab and that show in tabular form all the active tenders, the tenders already concluded and all the offers related to a specific tender. The goal of this function is to make the operation of the smart contract transparent, giving citizens the opportunity to verify its work.
 
-The previous step can be performed by choosing every account in the in the login tab.
+"see active tenders" and "see closed tenders" return a dataframe through a for loop of the solidity function "see_TenderDetails", filtering their state (active, closed) with the solidity function "isPending".
+
+"Get Bids Details" can be called after a tender is closed and return a dataframe through a for loop of the solidity function "getBidDetails"
+
+The previous step can be performed by choosing every account in the login tab.
 
 ## **Optimization**
 
@@ -92,6 +96,8 @@ In this way, we not only can control all the agents who interact and be sure tha
 For example, without this role-based system and threshold for the bids, one main problem we could have incurred is that some malicious users could have started to send a very large amount of bids.
 The cost of some functions in our smart contract, especially compute_scores and assign_winner which rely on a for loop whose length depends on the number of participants,  would have rocketed, causing consequently an unsustainable economical burden for the PA, creator of the tender.
 Since in our contract the Public Administration has to authorize each firm prior to the bidding phase and those authorized firm can only bid once, the aforementioned risk has been avoided.
+
+Another security issue was how to deliver the confidential data of a bid without any risk of revealing those date before the deadline. We decided to create 2 deadline windows, one for the hash and one with the actual data. Since there are many SHA-3 libraries online we had to create an unencrypted message difficult to crack, we decided to separate each of our sensibile data (price, time, environment) with 10 random characters (including special characters) and then create a single string to hash (for example if the data [price, time, environment] are= [1000,50,4] the unencrypted message to hash will be "**1000**!#28fjrc5@**50**!#28fjrc5@**4**!#28fjrc5@"). This turned out to be a good solution not only for security reasons but also to avoid complicate structures (lists, tuples,dictionaries) to hash. After the submission of the hash is txt file is created **ONLY IN THE LOCAL MACHINE** with the tender id, the unencrypted message and the separator. Before the second deadline the company has to deliver the txt file that will be elaborated firstly by the python code (output=tender_id, unencrypted message, separator) and then by the smart contract that will check if the hashes match and will split the unencrypted message in the sensitive data (price,time,environment). Doing so, it's impossible even for the PA to know the bid details before the hash deadline that is mandatory for every firm. It is also really difficult to crack the hash with brute force since the 10 characters separator is different for every bid of every tender and it is sent to the blockchain only after the hash deadline.
 
 We have also assured that each rule is respected by inserting various ```require()``` that prevent, for example, any offer beyond the deadline from being considered and evaluated  or, yet, any bidder from modifying its own project once sent.
 Moreover, we have also taken security measures on the numerical side: indeed we avoid overflows by making use of the ```SafeMath``` library.
