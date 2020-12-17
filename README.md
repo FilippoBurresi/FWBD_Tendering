@@ -63,9 +63,9 @@ All these steps can be performed and visualized by accessing the tkinter interfa
 
 Any citizen with an account can call all the functions present in the Notice Board tab and that show in tabular form all the active tenders, the tenders already concluded and all the offers related to a specific tender. The goal of this function is to make the operation of the smart contract transparent, giving citizens the opportunity to verify its work.
 
-"see active tenders" and "see closed tenders" return a dataframe through a for loop of the solidity function "see_TenderDetails", filtering their state (active, closed) with the solidity function "isPending".
+"see active tenders" and "see closed tenders" return a dataframe through a for loop of the solidity function "see_TenderDetails" (input: tender_id), filtering their state (active, closed) with the solidity function "isPending" (input: tender_id).
 
-"Get Bids Details" can be called after a tender is closed and return a dataframe through a for loop of the solidity function "getBidDetails"
+"Get Bids Details" can be called after a tender is closed and returns a dataframe through a for loop of the solidity function "getBidDetails" (input: tender_id, address of the contractor)
 
 The previous step can be performed by choosing every account in the login tab.
 
