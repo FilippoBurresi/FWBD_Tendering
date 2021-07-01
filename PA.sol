@@ -1,6 +1,7 @@
-pragma solidity >0.4.13 <0.7.0;
+pragma solidity >0.4.13 <0.8.6;
 
 import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/AccessControl.sol";
+// import "../.deps/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/AccessControl.sol"
  
  /// @title A smart contract for controlling the accessibility 
  /// @notice With the following contract we create two different 'characters':

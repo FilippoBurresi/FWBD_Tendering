@@ -1,4 +1,4 @@
-pragma solidity >0.4.13 <0.7.0;
+pragma solidity >0.4.13 <0.8.6;
 pragma experimental ABIEncoderV2;
 
 import "./strings.sol"; // needed for splitting text later
@@ -59,7 +59,7 @@ contract TenderingSmartContract is PA {
      */
     modifier inTimeHash (uint256 _tenderKey) {
         require(
-        (now >= tenders[_tenderKey].bidOpeningDate) && (now <= tenders[_tenderKey].bidSubmissionClosingDateHash),
+        (block.timestamp >= tenders[_tenderKey].bidOpeningDate) && (block.timestamp <= tenders[_tenderKey].bidSubmissionClosingDateHash),
         "hash sent before the opening date or after the hash closing date!"
         );
         _;
@@ -83,7 +83,7 @@ contract TenderingSmartContract is PA {
      */
     modifier inTimeData (uint256 _tenderKey) {
         require(
-        (now >= tenders[_tenderKey].bidSubmissionClosingDateHash) && (now < tenders[_tenderKey].bidSubmissionClosingDateData),
+        (block.timestamp >= tenders[_tenderKey].bidSubmissionClosingDateHash) && (block.timestamp < tenders[_tenderKey].bidSubmissionClosingDateData),
         "data sent before the hash closing date or after the data closing date."
         );
         _;
@@ -94,7 +94,7 @@ contract TenderingSmartContract is PA {
     * has alredy passed.
     */
     modifier afterDeadline (uint256 _tenderKey) {
-        require(tenders[_tenderKey].bidSubmissionClosingDateData < now);
+        require(tenders[_tenderKey].bidSubmissionClosingDateData < block.timestamp);
         _;
     }
 
@@ -123,9 +123,9 @@ contract TenderingSmartContract is PA {
         c.tenderName = _tenderName;
         c.description = _description;
         // the parameters of the function are used to set the characteristics of the tender
-        c.bidOpeningDate = now;
-        c.bidSubmissionClosingDateHash= now + (_daysUntilClosingDateHash* 1 seconds);
-        c.bidSubmissionClosingDateData = now + (_daysUntilClosingDateData* 1 seconds);
+        c.bidOpeningDate = block.timestamp;
+        c.bidSubmissionClosingDateHash= block.timestamp + (_daysUntilClosingDateHash* 1 seconds);
+        c.bidSubmissionClosingDateData = block.timestamp + (_daysUntilClosingDateData* 1 seconds);
         c.tenderingInstitution = msg.sender;
         // the chosen weights are memorized
         c.evaluation_weights.push(w1);
@@ -402,7 +402,7 @@ contract TenderingSmartContract is PA {
 
         bool pending_status;
 
-        if (tenders[_tenderKey].bidSubmissionClosingDateHash > now) {
+        if (tenders[_tenderKey].bidSubmissionClosingDateHash > block.timestamp) {
             pending_status = true;
         } else {
             pending_status = false;
